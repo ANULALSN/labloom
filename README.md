@@ -6,13 +6,13 @@ Labloom is a premium, full-stack healthcare application designed for seamless in
 
 - **🛡️ Secure Onboarding**: Role-based access for Patients, Doctors, Hospitals, and Labs with OTP-based authentication.
 - **🩺 Doctor Consultations**: Search for specialists, book appointments, and maintain clinical histories.
+- **📱 Flutter Patient App**: The patient experience is designed for mobile integration (see the [Patient Mobile API Guide](./labloom_new/PATIENT_MOBILE_API.md)).
 - **🧪 Integrated Lab Workflow**: 
-    - Patients can browse tests and book lab visits.
-    - Labs can manage bookings and upload digital reports.
-    - **Doctor Verification**: Reports are reviewed and verified by doctors before being released to patients.
+    - 🧪 **Labs**: Manage bookings and upload digital reports.
+    - 🩺 **Doctors**: Review and verify reports before patient release.
+    - 👤 **Patients**: Access verified results on mobile.
 - **💬 Professional Messaging**: Real-time chat between doctors and patients (available for 7 days post-appointment).
-- **📊 Health Dashboard**: Personalized overview of upcoming visits, recent clinical activity, and vital health metrics.
-- **🎨 Premium UI**: A clean, professional "White Aqua Blue" theme designed for medical environments.
+- **🎨 Premium UI**: A clean, professional "White Aqua Blue" theme for the provider portals (Doctor, Lab, Admin).
 
 ---
 
