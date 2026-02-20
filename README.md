@@ -68,9 +68,11 @@ npm run dev
 ---
 
 ## 📋 Deployment Note
+- **Live Backend API**: [https://labloom.onrender.com](https://labloom.onrender.com)
+- **Interactive Documentation**: [https://labloom.onrender.com/docs/swagger](https://labloom.onrender.com/docs/swagger)
 
 This project is ready for deployment on platforms like **Render** (Backend) and **Vercel/Netlify** (Frontend).
-- Ensure the `VITE_API_URL` environment variable is set in your frontend hosting.
+- Ensure the `VITE_API_URL` environment variable is set in your frontend hosting to the live backend URL.
 - Ensure `MONGO_URI` and `JWT_SECRET` are set in your backend hosting.
 
 ---

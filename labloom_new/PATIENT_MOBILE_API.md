@@ -48,5 +48,5 @@ All requests should use JSON headers. Protected routes require `Authorization: B
 | **Send Message** | `POST` | `/api/chat/send` | Send text to the doctor |
 
 ---
-**Base URL:** `https://your-hosted-api.com`  
-**Swagger Docs:** `/docs/swagger` (Fully detailed schema)
+**Base URL:** `https://labloom.onrender.com`  
+**Swagger Docs:** `https://labloom.onrender.com/docs/swagger` (Fully detailed schema)

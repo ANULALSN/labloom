@@ -3,8 +3,8 @@
 Labloom is a comprehensive healthcare application backend designed to manage lab tests, doctor consultations, medical records, and patient health tracking.
 
 ## 🚀 Live Demo & API Documentation
-- **Swagger Documentation:** [https://labloom-new.onrender.com/docs/swagger](https://labloom-new.onrender.com/docs/swagger)
-- **Base URL:** `https://labloom-new.onrender.com`
+- **Swagger Documentation:** [https://labloom.onrender.com/docs/swagger](https://labloom.onrender.com/docs/swagger)
+- **Base URL:** `https://labloom.onrender.com`
 
 ## 🛠 Tech Stack
 - **Runtime:** Node.js
