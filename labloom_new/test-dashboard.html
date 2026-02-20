@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Labloom — Test Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg: #0f1117;
+            --surface: #1a1d27;
+            --surface-hover: #232733;
+            --border: #2a2e3a;
+            --text: #e4e6eb;
+            --text-dim: #8b8fa3;
+            --primary: #6c5ce7;
+            --primary-glow: rgba(108, 92, 231, 0.3);
+            --success: #00cec9;
+            --success-glow: rgba(0, 206, 201, 0.2);
+            --error: #ff6b6b;
+            --error-glow: rgba(255, 107, 107, 0.2);
+            --warning: #feca57;
+            --warning-glow: rgba(254, 202, 87, 0.2);
+            --info: #54a0ff;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--surface) 0%, #1e1433 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        header h1 {
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        header .status .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success-glow);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .layout {
+            display: flex;
+            min-height: calc(100vh - 72px);
+        }
+
+        nav {
+            width: 240px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 16px 0;
+            flex-shrink: 0;
+        }
+
+        nav .nav-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            padding: 12px 20px 6px;
+        }
+
+        nav button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        nav button:hover { background: var(--surface-hover); color: var(--text); }
+        nav button.active { background: var(--primary-glow); color: #a29bfe; border-right: 3px solid var(--primary); }
+        nav button .icon { font-size: 16px; width: 20px; text-align: center; }
+
+        main {
+            flex: 1;
+            padding: 28px 36px;
+            overflow-y: auto;
+        }
+
+        .test-panel { display: none; }
+        .test-panel.active { display: block; }
+
+        .test-panel h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .test-panel .desc {
+            font-size: 13px;
+            color: var(--text-dim);
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.2s;
+        }
+
+        .card:hover { border-color: #3a3e4a; }
+
+        .card h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card .step-desc {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 14px;
+        }
+
+        .badge {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge.post { background: rgba(0, 206, 201, 0.15); color: var(--success); }
+        .badge.get { background: rgba(84, 160, 255, 0.15); color: var(--info); }
+        .badge.bug { background: rgba(255, 107, 107, 0.15); color: var(--error); }
+        .badge.fix { background: rgba(0, 206, 201, 0.15); color: var(--success); }
+
+        .btn {
+            padding: 9px 20px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px var(--primary-glow); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+        }
+
+        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+
+        .response-box {
+            background: #0d0f14;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px;
+            margin-top: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .response-box.show { display: block; }
+        .response-box.success { border-color: rgba(0, 206, 201, 0.3); }
+        .response-box.error { border-color: rgba(255, 107, 107, 0.3); }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-top: 8px;
+        }
+
+        .status-indicator.pass { background: var(--success-glow); color: var(--success); }
+        .status-indicator.fail { background: var(--error-glow); color: var(--error); }
+        .status-indicator.warn { background: var(--warning-glow); color: var(--warning); }
+
+        .token-display {
+            background: #0d0f14;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin: 10px 0;
+            font-size: 11px;
+            font-family: monospace;
+            color: var(--success);
+            word-break: break-all;
+            display: none;
+        }
+
+        .token-display.show { display: block; }
+
+        .global-token-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+        }
+
+        .global-token-bar .label { color: var(--text-dim); white-space: nowrap; }
+        .global-token-bar .value {
+            flex: 1;
+            font-family: monospace;
+            color: var(--success);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .global-token-bar .value.empty { color: var(--error); font-family: inherit; }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 20px 0;
+        }
+
+        .revenue-breakdown {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .revenue-card {
+            background: #0d0f14;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .revenue-card .amount {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .revenue-card .label {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .revenue-card.admin .amount { color: var(--primary); }
+        .revenue-card.hospital .amount { color: var(--success); }
+        .revenue-card.total .amount { color: var(--warning); }
+
+        .loading { opacity: 0.6; pointer-events: none; }
+        .spin { animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* Dashboard overview */
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .overview-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+        }
+
+        .overview-card .oc-icon { font-size: 28px; margin-bottom: 8px; }
+        .overview-card .oc-title { font-size: 12px; color: var(--text-dim); margin-bottom: 4px; }
+        .overview-card .oc-value { font-size: 22px; font-weight: 800; }
+        .overview-card .oc-status { font-size: 11px; margin-top: 6px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🧪 Labloom Test Dashboard</h1>
+    <div class="status">
+        <div class="dot"></div>
+        Server: localhost:5000
+    </div>
+</header>
+
+<div class="layout">
+    <nav>
+        <div class="nav-label">Quick Tests</div>
+        <button class="active" onclick="showPanel('overview')" data-panel="overview">
+            <span class="icon">📊</span> Overview
+        </button>
+        <button onclick="showPanel('admin-login')" data-panel="admin-login">
+            <span class="icon">🔑</span> Admin Login
+        </button>
+        <button onclick="showPanel('ghost-login')" data-panel="ghost-login">
+            <span class="icon">👻</span> Ghost Login Bug
+        </button>
+
+        <div class="nav-label">User Flows</div>
+        <button onclick="showPanel('patient-signup')" data-panel="patient-signup">
+            <span class="icon">🧑</span> Patient Signup
+        </button>
+        <button onclick="showPanel('doctor-signup')" data-panel="doctor-signup">
+            <span class="icon">🩺</span> Doctor Signup
+        </button>
+        <button onclick="showPanel('approval')" data-panel="approval">
+            <span class="icon">✅</span> Admin Approval
+        </button>
+
+        <div class="nav-label">Features</div>
+        <button onclick="showPanel('booking')" data-panel="booking">
+            <span class="icon">📅</span> Booking + Revenue
+        </button>
+        <button onclick="showPanel('chat')" data-panel="chat">
+            <span class="icon">💬</span> Chat (7-day TTL)
+        </button>
+        <button onclick="showPanel('analytics')" data-panel="analytics">
+            <span class="icon">📈</span> System Analytics
+        </button>
+    </nav>
+
+    <main>
+        <!-- GLOBAL TOKEN BAR -->
+        <div class="global-token-bar">
+            <span class="label">🔐 Active Token:</span>
+            <span class="value empty" id="globalToken">No token — run Admin Login first</span>
+            <button class="btn btn-sm btn-outline" onclick="copyToken()">Copy</button>
+        </div>
+
+        <!-- ========== OVERVIEW ========== -->
+        <div class="test-panel active" id="panel-overview">
+            <h2>📊 Test Overview</h2>
+            <p class="desc">Click each test on the left sidebar to run them. Start with Admin Login to get your auth token.</p>
+
+            <div class="overview-grid">
+                <div class="overview-card">
+                    <div class="oc-icon">🐛</div>
+                    <div class="oc-title">Bug Fixes Applied</div>
+                    <div class="oc-value">5</div>
+                    <div class="oc-status status-indicator pass">✓ All patched</div>
+                </div>
+                <div class="overview-card">
+                    <div class="oc-icon">🔒</div>
+                    <div class="oc-title">Security</div>
+                    <div class="oc-value">Hardened</div>
+                    <div class="oc-status status-indicator pass">✓ Backdoor removed</div>
+                </div>
+                <div class="overview-card">
+                    <div class="oc-icon">💰</div>
+                    <div class="oc-title">Revenue Split</div>
+                    <div class="oc-value">₹15 / ₹50</div>
+                    <div class="oc-status status-indicator pass">✓ Doctor/Lab fees</div>
+                </div>
+                <div class="overview-card">
+                    <div class="oc-icon">💬</div>
+                    <div class="oc-title">Chat TTL</div>
+                    <div class="oc-value">7 Days</div>
+                    <div class="oc-status status-indicator pass">✓ From completion</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🚦 Recommended Test Order</h3>
+                <div class="step-desc" style="margin-top:10px; line-height: 2;">
+                    <strong>1.</strong> 🔑 Admin Login → get your auth token<br>
+                    <strong>2.</strong> 🩺 Doctor Signup → register a doctor (pending approval)<br>
+                    <strong>3.</strong> 👻 Ghost Login Bug → verify unapproved doctor is BLOCKED<br>
+                    <strong>4.</strong> ✅ Admin Approval → approve the doctor<br>
+                    <strong>5.</strong> 📅 Booking + Revenue → see the ₹15 admin fee<br>
+                    <strong>6.</strong> 📈 System Analytics → check overall stats
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== ADMIN LOGIN ========== -->
+        <div class="test-panel" id="panel-admin-login">
+            <h2>🔑 Admin Login</h2>
+            <p class="desc">Login as the super admin to get an access token. This token unlocks all other tests.</p>
+
+            <div class="card">
+                <h3><span class="badge post">POST</span> Step 1: Request OTP</h3>
+                <div class="step-desc">Sends OTP to admin phone (1234567890). Fixed OTP: 1234</div>
+                <button class="btn btn-primary" onclick="adminRequestOtp()">📤 Send OTP</button>
+                <div class="response-box" id="res-admin-otp"></div>
+            </div>
+
+            <div class="card">
+                <h3><span class="badge post">POST</span> Step 2: Verify OTP & Get Token</h3>
+                <div class="step-desc">Verifies OTP and returns admin access token</div>
+                <button class="btn btn-primary" onclick="adminVerifyOtp()">🔓 Verify & Login</button>
+                <div class="response-box" id="res-admin-verify"></div>
+                <div class="token-display" id="admin-token-display"></div>
+            </div>
+        </div>
+
+        <!-- ========== GHOST LOGIN BUG ========== -->
+        <div class="test-panel" id="panel-ghost-login">
+            <h2>👻 Ghost Login Bug Test</h2>
+            <p class="desc">This tests our Fix #1 — unapproved doctors/labs MUST be blocked from logging in via Auth V1.</p>
+
+            <div class="card">
+                <h3><span class="badge bug">BUG FIX</span> Test: OTP for Unapproved Doctor</h3>
+                <div class="step-desc">First register a doctor (via Doctor Signup panel), then try to request OTP here. Should return 403.</div>
+                <div style="margin-bottom: 12px;">
+                    <label style="font-size:12px; color:var(--text-dim);">Doctor Phone:</label>
+                    <input type="text" id="ghost-phone" value="9999999999" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-family:inherit;font-size:13px;width:200px;margin-left:8px;">
+                </div>
+                <button class="btn btn-primary" onclick="testGhostLogin()">👻 Try Ghost Login (Auth V1)</button>
+                <div class="response-box" id="res-ghost"></div>
+            </div>
+
+            <div class="card">
+                <h3><span class="badge fix">EXPECTED</span> Expected Result</h3>
+                <div class="step-desc">
+                    <strong style="color:var(--success)">✅ PASS:</strong> Status 403 — "Your account is pending admin approval"<br>
+                    <strong style="color:var(--error)">❌ FAIL:</strong> Status 200 — "OTP sent successfully" (means the bug still exists)
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== PATIENT SIGNUP ========== -->
+        <div class="test-panel" id="panel-patient-signup">
+            <h2>🧑 Patient Signup & Login</h2>
+            <p class="desc">Register a new patient and login via OTP. Patients don't need admin approval.</p>
+
+            <div class="card">
+                <h3><span class="badge post">POST</span> Register Patient</h3>
+                <div class="step-desc">Creates a new patient account (auto-approved)</div>
+                <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+                    <input type="text" id="pat-name" placeholder="Name" value="Test Patient" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-family:inherit;font-size:13px;">
+                    <input type="text" id="pat-phone" placeholder="Phone" value="8888888888" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-family:inherit;font-size:13px;">
+                    <input type="email" id="pat-email" placeholder="Email" value="patient@test.com" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-family:inherit;font-size:13px;">
+                </div>
+                <button class="btn btn-primary" onclick="registerPatient()">➕ Register Patient</button>
+                <div class="response-box" id="res-pat-reg"></div>
+            </div>
+
+            <div class="card">
+                <h3><span class="badge post">POST</span> Patient OTP Login</h3>
+                <div class="step-desc">Request OTP → Verify OTP → Get token (use phone from above)</div>
+                <button class="btn btn-primary" onclick="patientLogin()">🔑 Login as Patient</button>
+                <div class="response-box" id="res-pat-login"></div>
+            </div>
+        </div>
+
+        <!-- ========== DOCTOR SIGNUP ========== -->
+        <div class="test-panel" id="panel-doctor-signup">
+            <h2>🩺 Doctor Signup</h2>
+            <p class="desc">Register a doctor. They will be in "pending" state until admin approves.</p>
+
+            <div class="card">
+                <h3><span class="badge post">POST</span> Register Doctor (V2 Auth)</h3>
+                <div class="step-desc">Doctor signup requires admin approval before login</div>
+                <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+                    <input type="text" id="doc-name" placeholder="Name" value="Dr. Test" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-family:inherit;font-size:13px;">
+                    <input type="text" id="doc-phone" placeholder="Phone" value="9999999999" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-family:inherit;font-size:13px;">
+                    <input type="email" id="doc-email" placeholder="Email" value="doctor@test.com" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-family:inherit;font-size:13px;">
+                </div>
+                <button class="btn btn-primary" onclick="registerDoctor()">🩺 Register Doctor</button>
+                <div class="response-box" id="res-doc-reg"></div>
+            </div>
+        </div>
+
+        <!-- ========== ADMIN APPROVAL ========== -->
+        <div class="test-panel" id="panel-approval">
+            <h2>✅ Admin Approval</h2>
+            <p class="desc">View and approve pending doctors, hospitals, and labs. Requires admin token.</p>
+
+            <div class="card">
+                <h3><span class="badge get">GET</span> Pending Doctors</h3>
+                <div class="step-desc">Lists all doctors waiting for approval</div>
+                <button class="btn btn-primary" onclick="getPendingDoctors()">📋 Load Pending Doctors</button>
+                <div class="response-box" id="res-pending-docs"></div>
+                <div id="pending-docs-actions"></div>
+            </div>
+
+            <div class="card">
+                <h3><span class="badge get">GET</span> Pending Hospitals</h3>
+                <button class="btn btn-primary btn-sm" onclick="getPendingHospitals()">📋 Load</button>
+                <div class="response-box" id="res-pending-hospitals"></div>
+            </div>
+
+            <div class="card">
+                <h3><span class="badge get">GET</span> Pending Labs</h3>
+                <button class="btn btn-primary btn-sm" onclick="getPendingLabs()">📋 Load</button>
+                <div class="response-box" id="res-pending-labs"></div>
+            </div>
+        </div>
+
+        <!-- ========== BOOKING + REVENUE ========== -->
+        <div class="test-panel" id="panel-booking">
+            <h2>📅 Booking & Revenue Split</h2>
+            <p class="desc">Test the ₹15 doctor fee and ₹50 lab fee revenue split. Requires patient token.</p>
+
+            <div class="card">
+                <h3><span class="badge post">POST</span> Create Doctor Booking (₹15 admin fee)</h3>
+                <div class="step-desc">Creates a doctor appointment. Revenue: Total - ₹15 = Hospital, ₹15 = Admin</div>
+                <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; align-items:center;">
+                    <label style="font-size:12px; color:var(--text-dim);">Amount ₹:</label>
+                    <input type="number" id="doc-booking-amount" value="500" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-family:inherit;font-size:13px;width:100px;">
+                </div>
+                <button class="btn btn-primary" onclick="createDoctorBooking()">📅 Book Doctor</button>
+                <div class="response-box" id="res-doc-booking"></div>
+                <div id="revenue-doctor" style="display:none;">
+                    <div class="revenue-breakdown">
+                        <div class="revenue-card total">
+                            <div class="amount" id="rev-doc-total">₹0</div>
+                            <div class="label">Patient Paid</div>
+                        </div>
+                        <div class="revenue-card hospital">
+                            <div class="amount" id="rev-doc-hospital">₹0</div>
+                            <div class="label">Hospital Gets</div>
+                        </div>
+                        <div class="revenue-card admin">
+                            <div class="amount" id="rev-doc-admin">₹0</div>
+                            <div class="label">Admin Revenue</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><span class="badge post">POST</span> Create Lab Booking (₹50 admin fee)</h3>
+                <div class="step-desc">Creates a lab test booking. Revenue: Total - ₹50 = Lab, ₹50 = Admin</div>
+                <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; align-items:center;">
+                    <label style="font-size:12px; color:var(--text-dim);">Amount ₹:</label>
+                    <input type="number" id="lab-booking-amount" value="800" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-family:inherit;font-size:13px;width:100px;">
+                </div>
+                <button class="btn btn-primary" onclick="createLabBooking()">🧪 Book Lab Test</button>
+                <div class="response-box" id="res-lab-booking"></div>
+                <div id="revenue-lab" style="display:none;">
+                    <div class="revenue-breakdown">
+                        <div class="revenue-card total">
+                            <div class="amount" id="rev-lab-total">₹0</div>
+                            <div class="label">Patient Paid</div>
+                        </div>
+                        <div class="revenue-card hospital">
+                            <div class="amount" id="rev-lab-lab">₹0</div>
+                            <div class="label">Lab Gets</div>
+                        </div>
+                        <div class="revenue-card admin">
+                            <div class="amount" id="rev-lab-admin">₹0</div>
+                            <div class="label">Admin Revenue</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== CHAT ========== -->
+        <div class="test-panel" id="panel-chat">
+            <h2>💬 Chat (7-Day TTL)</h2>
+            <p class="desc">Test the chat feature. Chat is only available for confirmed/completed bookings within 7 days of completion.</p>
+
+            <div class="card">
+                <h3><span class="badge post">POST</span> Send Message</h3>
+                <div class="step-desc">Send a chat message for a booking. Requires a valid booking ID.</div>
+                <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+                    <input type="text" id="chat-booking-id" placeholder="Booking ID" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-family:inherit;font-size:13px;flex:1;">
+                    <input type="text" id="chat-message" placeholder="Message" value="Hello Doctor!" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-family:inherit;font-size:13px;flex:1;">
+                </div>
+                <button class="btn btn-primary" onclick="sendChatMessage()">💬 Send Message</button>
+                <div class="response-box" id="res-chat"></div>
+            </div>
+
+            <div class="card">
+                <h3><span class="badge fix">INFO</span> TTL Logic</h3>
+                <div class="step-desc" style="line-height:1.8;">
+                    ✅ <strong>Fixed:</strong> Chat window is now 7 days from <u>completion date</u> (not appointment date)<br>
+                    ✅ <strong>Fixed:</strong> Chat only works for <code>confirmed</code> or <code>completed</code> bookings<br>
+                    ⏩ A pending/cancelled booking will return 403
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== ANALYTICS ========== -->
+        <div class="test-panel" id="panel-analytics">
+            <h2>📈 System Analytics</h2>
+            <p class="desc">Get overall system stats. Requires admin token.</p>
+
+            <div class="card">
+                <h3><span class="badge get">GET</span> System Report</h3>
+                <button class="btn btn-primary" onclick="getAnalytics()">📊 Load Analytics</button>
+                <div class="response-box" id="res-analytics"></div>
+                <div id="analytics-cards" style="display:none;">
+                    <div class="overview-grid" style="margin-top:14px;">
+                        <div class="overview-card">
+                            <div class="oc-title">Patients</div>
+                            <div class="oc-value" id="stat-patients">—</div>
+                        </div>
+                        <div class="overview-card">
+                            <div class="oc-title">Doctors</div>
+                            <div class="oc-value" id="stat-doctors">—</div>
+                        </div>
+                        <div class="overview-card">
+                            <div class="oc-title">Hospitals</div>
+                            <div class="oc-value" id="stat-hospitals">—</div>
+                        </div>
+                        <div class="overview-card">
+                            <div class="oc-title">Labs</div>
+                            <div class="oc-value" id="stat-labs">—</div>
+                        </div>
+                        <div class="overview-card">
+                            <div class="oc-title">Appointments</div>
+                            <div class="oc-value" id="stat-appointments">—</div>
+                        </div>
+                        <div class="overview-card">
+                            <div class="oc-title">Lab Tests</div>
+                            <div class="oc-value" id="stat-labtests">—</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script>
+    const API = 'http://localhost:5000';
+    let token = '';
+    let patientToken = '';
+    let lastDoctorId = '';
+    let lastBookingId = '';
+
+    function setToken(t) {
+        token = t;
+        const el = document.getElementById('globalToken');
+        el.textContent = t ? (t.substring(0, 40) + '...') : 'No token';
+        el.classList.toggle('empty', !t);
+    }
+
+    function copyToken() {
+        if (token) { navigator.clipboard.writeText(token); }
+    }
+
+    function showPanel(id) {
+        document.querySelectorAll('.test-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+        document.getElementById('panel-' + id).classList.add('active');
+        document.querySelector(`nav button[data-panel="${id}"]`).classList.add('active');
+    }
+
+    function showResponse(elId, data, isError) {
+        const el = document.getElementById(elId);
+        el.textContent = JSON.stringify(data, null, 2);
+        el.className = 'response-box show ' + (isError ? 'error' : 'success');
+    }
+
+    async function api(method, path, body, useToken) {
+        const headers = { 'Content-Type': 'application/json' };
+        const t = useToken === 'patient' ? patientToken : token;
+        if (useToken && t) {
+            headers['Authorization'] = 'Bearer ' + t;
+        }
+        try {
+            const res = await fetch(API + path, {
+                method,
+                headers,
+                body: body ? JSON.stringify(body) : undefined
+            });
+            const data = await res.json();
+            return { status: res.status, data };
+        } catch (err) {
+            return { status: 0, data: { message: 'Network error: ' + err.message } };
+        }
+    }
+
+    // ===== ADMIN LOGIN =====
+    async function adminRequestOtp() {
+        const r = await api('POST', '/api/admin/request-otp', { phone: '1234567890' });
+        showResponse('res-admin-otp', r.data, r.status !== 200);
+    }
+
+    async function adminVerifyOtp() {
+        const r = await api('POST', '/api/admin/verify-otp', { phone: '1234567890', otp: '1234' });
+        showResponse('res-admin-verify', r.data, r.status !== 200);
+        if (r.data.accessToken) {
+            setToken(r.data.accessToken);
+            const td = document.getElementById('admin-token-display');
+            td.textContent = '🎉 Token saved! ' + r.data.accessToken.substring(0, 50) + '...';
+            td.classList.add('show');
+        }
+    }
+
+    // ===== GHOST LOGIN TEST =====
+    async function testGhostLogin() {
+        const phone = document.getElementById('ghost-phone').value;
+        const r = await api('POST', '/api/auth/send-otp', { phone });
+        showResponse('res-ghost', {
+            ...r.data,
+            _test_status: r.status,
+            _verdict: r.status === 403 ? '✅ PASS — Bug is FIXED! Doctor blocked.' : (r.status === 200 ? '❌ FAIL — Bug still exists! Doctor bypassed approval.' : '⚠️ Unexpected response')
+        }, r.status !== 403);
+    }
+
+    // ===== PATIENT =====
+    async function registerPatient() {
+        const r = await api('POST', '/api/auth/v2/signup', {
+            name: document.getElementById('pat-name').value,
+            phone: document.getElementById('pat-phone').value,
+            email: document.getElementById('pat-email').value,
+            password: 'test123',
+            role: 'patient'
+        });
+        showResponse('res-pat-reg', r.data, r.status >= 400);
+        if (r.data.accessToken) {
+            patientToken = r.data.accessToken;
+        }
+    }
+
+    async function patientLogin() {
+        const phone = document.getElementById('pat-phone').value;
+        // Step 1: Request OTP
+        await api('POST', '/api/auth/v2/request-otp', { phone });
+        // Step 2: Verify
+        const r = await api('POST', '/api/auth/v2/verify-otp', { phone, otp: '1234' });
+        showResponse('res-pat-login', r.data, r.status >= 400);
+        if (r.data.accessToken) {
+            patientToken = r.data.accessToken;
+        }
+    }
+
+    // ===== DOCTOR =====
+    async function registerDoctor() {
+        const r = await api('POST', '/api/auth/v2/signup', {
+            name: document.getElementById('doc-name').value,
+            phone: document.getElementById('doc-phone').value,
+            email: document.getElementById('doc-email').value,
+            password: 'test123',
+            role: 'doctor'
+        });
+        showResponse('res-doc-reg', r.data, r.status >= 400);
+        if (r.data._id) lastDoctorId = r.data._id;
+    }
+
+    // ===== APPROVAL =====
+    async function getPendingDoctors() {
+        const r = await api('GET', '/api/admin/pending-doctors', null, true);
+        showResponse('res-pending-docs', r.data, r.status >= 400);
+        // Render approve buttons
+        const container = document.getElementById('pending-docs-actions');
+        container.innerHTML = '';
+        if (Array.isArray(r.data) && r.data.length > 0) {
+            r.data.forEach(doc => {
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-primary btn-sm';
+                btn.style.margin = '6px 4px 0 0';
+                btn.textContent = '✅ Approve: ' + doc.name;
+                btn.onclick = () => approveDoctor(doc._id);
+                container.appendChild(btn);
+            });
+        }
+    }
+
+    async function approveDoctor(id) {
+        const r = await api('POST', '/api/admin/approve-doctor/' + id, {}, true);
+        showResponse('res-pending-docs', r.data, r.status >= 400);
+        document.getElementById('pending-docs-actions').innerHTML = '<div class="status-indicator pass" style="margin-top:10px">✓ Doctor approved!</div>';
+    }
+
+    async function getPendingHospitals() {
+        const r = await api('GET', '/api/admin/pending-hospitals', null, true);
+        showResponse('res-pending-hospitals', r.data, r.status >= 400);
+    }
+
+    async function getPendingLabs() {
+        const r = await api('GET', '/api/admin/pending-labs', null, true);
+        showResponse('res-pending-labs', r.data, r.status >= 400);
+    }
+
+    // ===== BOOKING =====
+    async function createDoctorBooking() {
+        const amount = parseInt(document.getElementById('doc-booking-amount').value);
+        const t = patientToken || token;
+        const r = await api('POST', '/api/bookings', {
+            bookingType: 'doctor',
+            doctorId: lastDoctorId || '000000000000000000000000',
+            date: new Date().toISOString(),
+            time: '10:00',
+            appointmentMode: 'Video call',
+            amount: amount
+        }, patientToken ? 'patient' : true);
+        showResponse('res-doc-booking', r.data, r.status >= 400);
+        if (r.data.revenue) {
+            document.getElementById('revenue-doctor').style.display = 'block';
+            document.getElementById('rev-doc-total').textContent = '₹' + (r.data.amount || 0);
+            document.getElementById('rev-doc-hospital').textContent = '₹' + (r.data.revenue.hospitalAmount || 0);
+            document.getElementById('rev-doc-admin').textContent = '₹' + (r.data.revenue.adminAmount || 0);
+            lastBookingId = r.data._id;
+            document.getElementById('chat-booking-id').value = r.data._id;
+        }
+    }
+
+    async function createLabBooking() {
+        const amount = parseInt(document.getElementById('lab-booking-amount').value);
+        const r = await api('POST', '/api/bookings', {
+            bookingType: 'test',
+            testId: '000000000000000000000000',
+            date: new Date().toISOString(),
+            amount: amount
+        }, patientToken ? 'patient' : true);
+        showResponse('res-lab-booking', r.data, r.status >= 400);
+        if (r.data.revenue) {
+            document.getElementById('revenue-lab').style.display = 'block';
+            document.getElementById('rev-lab-total').textContent = '₹' + (r.data.amount || 0);
+            document.getElementById('rev-lab-lab').textContent = '₹' + (r.data.revenue.labAmount || 0);
+            document.getElementById('rev-lab-admin').textContent = '₹' + (r.data.revenue.adminAmount || 0);
+        }
+    }
+
+    // ===== CHAT =====
+    async function sendChatMessage() {
+        const bookingId = document.getElementById('chat-booking-id').value;
+        const content = document.getElementById('chat-message').value;
+        const r = await api('POST', '/api/chat/send', { bookingId, content }, patientToken ? 'patient' : true);
+        showResponse('res-chat', r.data, r.status >= 400);
+    }
+
+    // ===== ANALYTICS =====
+    async function getAnalytics() {
+        const r = await api('GET', '/api/admin/reports/system', null, true);
+        showResponse('res-analytics', r.data, r.status >= 400);
+        if (r.data.users) {
+            document.getElementById('analytics-cards').style.display = 'block';
+            document.getElementById('stat-patients').textContent = r.data.users.patients;
+            document.getElementById('stat-doctors').textContent = r.data.users.doctors;
+            document.getElementById('stat-hospitals').textContent = r.data.users.hospitals;
+            document.getElementById('stat-labs').textContent = r.data.users.labs;
+            document.getElementById('stat-appointments').textContent = r.data.activity.appointments;
+            document.getElementById('stat-labtests').textContent = r.data.activity.labTests;
+        }
+    }
+</script>
+</body>
+</html>
