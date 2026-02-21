@@ -1,8 +1,8 @@
 # Labloom Frontend Integration Guide
 
-**Version:** 1.0.0  
-**Base URL:** `https://labloom-new.onrender.com`  
-**Last Updated:** February 9, 2026
+**Version:** 1.1.0  
+**Base URL:** `https://labloom.onrender.com`  
+**Last Updated:** February 21, 2026
 
 ---
 
@@ -58,7 +58,7 @@ api.interceptors.response.use(
       
       try {
         const refreshToken = localStorage.getItem('refreshToken');
-        const { data } = await axios.post(`${API_BASE_URL}/api/auth/refresh-token`, {
+        const { data } = await axios.post(`${API_BASE_URL}/api/auth/v2/refresh-token`, {
           refreshToken,
         });
         
@@ -87,30 +87,26 @@ export default api;
 
 ### 1. User Registration (Signup)
 
-**Endpoint:** `POST /api/auth/signup`
+**Endpoint:** `POST /api/auth/v2/signup`
 
 ```javascript
 // Register a new user
 const signup = async (userData) => {
   try {
-    const response = await api.post('/api/auth/signup', {
+    const response = await api.post('/api/auth/v2/signup', {
       name: userData.name,
       email: userData.email,
       phone: userData.phone,
-      password: userData.password,
       role: userData.role, // 'patient', 'doctor', 'lab', 'hospital'
-      privacyPolicyAccepted: true, // Required for patients. For others, this is forced to false until admin approval.
     });
     
-    // NOTE: For 'doctor', 'lab', and 'hospital', this will return a 201 status 
+    // NOTE: For 'doctor', 'lab', and 'hospital', this will return 201 
     // but without tokens, as they require Admin Approval first.
     
     if (response.data.accessToken) {
         localStorage.setItem('accessToken', response.data.accessToken);
         localStorage.setItem('refreshToken', response.data.refreshToken);
     }
-    localStorage.setItem('user', JSON.stringify(response.data));
-    
     return response.data;
   } catch (error) {
     console.error('Signup error:', error.response?.data);
@@ -140,18 +136,15 @@ const signup = async (userData) => {
 
 **Step 1: Request OTP**
 
-**Endpoint:** `POST /api/auth/request-otp`
+**Endpoint:** `POST /api/auth/v2/request-otp`
 
 ```javascript
 const requestOTP = async (phone) => {
   try {
-    const response = await api.post('/api/auth/request-otp', { phone });
-    return response.data;
+    const response = await api.post('/api/auth/v2/request-otp', { phone });
+    return response.data; // Includes simulated OTP in response for development
   } catch (error) {
     // 403 error means account is pending admin approval
-    if (error.response?.status === 403) {
-      alert("Your account is pending admin approval.");
-    }
     console.error('OTP request error:', error.response?.data);
     throw error;
   }
@@ -160,17 +153,16 @@ const requestOTP = async (phone) => {
 
 **Step 2: Verify OTP**
 
-**Endpoint:** `POST /api/auth/verify-otp`
+**Endpoint:** `POST /api/auth/v2/verify-otp`
 
 ```javascript
 const verifyOTP = async (phone, otp) => {
   try {
-    const response = await api.post('/api/auth/verify-otp', { phone, otp });
+    const response = await api.post('/api/auth/v2/verify-otp', { phone, otp });
     
     // Store tokens
     localStorage.setItem('accessToken', response.data.accessToken);
     localStorage.setItem('refreshToken', response.data.refreshToken);
-    localStorage.setItem('user', JSON.stringify(response.data));
     
     return response.data;
   } catch (error) {
@@ -251,32 +243,19 @@ const getPatientDashboard = async () => {
 }
 ```
 
-### Profile Management
-
 **Get Profile:** `GET /api/patients/me`
 
+**Onboarding (4-Step):** `PATCH /api/patients/health-profile`
+
 ```javascript
-const getMyProfile = async () => {
-  const response = await api.get('/api/patients/me');
+const submitOnboarding = async (formData) => {
+  // formData should include personalData, emergencyContact, healthProfile, lifestyle
+  const response = await api.patch('/api/patients/health-profile', formData);
   return response.data;
 };
 ```
 
-**Update Profile:** `PATCH /api/patients/me`
-
-```javascript
-const updateMyProfile = async (updates) => {
-  const response = await api.patch('/api/patients/me', {
-    name: updates.name,
-    email: updates.email,
-    phone: updates.phone,
-    address: updates.address,
-    dateOfBirth: updates.dateOfBirth,
-    gender: updates.gender,
-  });
-  return response.data;
-};
-```
+**Update Basic Profile:** `PATCH /api/patients/me`
 
 ### Health Metrics
 

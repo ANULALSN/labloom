@@ -8,28 +8,25 @@
 ## 🔐 Authentication
 Use these endpoints to manage user registration, login, and profile security. All private endpoints require a `Bearer <token>` in the Authorization header.
 
-### 1. Register User
-`POST /api/auth/register`
-*   **Description:** Creates a new patient account.
+### 1. Register User (V2)
+`POST /api/auth/v2/signup`
+*   **Description:** Creates a new account. Restricted roles (Doctor/Lab/Hospital) require Admin approval.
 *   **Body:**
     ```json
     {
-      "name": "John Doe",
-      "phone": "+1234567890",
-      "email": "john@example.com",
-      "password": "securepassword",
-      "privacyPolicyAccepted": true
+      "name": "Jane Smith",
+      "phone": "+91XXXXXXXXXX",
+      "email": "jane@example.com",
+      "role": "patient"
     }
     ```
-*   **Response:** `201 Created` with user details and JWT token.
 
-### 2. Login (Password)
-`POST /api/auth/login`
-*   **Body:** `{"email": "john@example.com", "password": "securepassword"}`
+### 2. Login (OTP Flow - V2)
+*   **Step 1: Request OTP:** `POST /api/auth/v2/request-otp` | Body: `{"phone": "+91..."}`
+*   **Step 2: Verify OTP:** `POST /api/auth/v2/verify-otp` | Body: `{"phone": "+91...", "otp": "1234"}`
 
-### 3. Login (OTP Flow)
-*   **Step 1: Send OTP:** `POST /api/auth/login-otp` | Body: `{"phone": "+1234567890"}`
-*   **Step 2: Verify OTP:** `POST /api/auth/verify-otp` | Body: `{"phone": "+1234567890", "otp": "1234"}`
+### 3. Account Approval Policy
+Doctors, Labs, and Hospitals **cannot** log in until their `verificationStatus` is approved by an Admin.
 
 ---
 
@@ -37,13 +34,13 @@ Use these endpoints to manage user registration, login, and profile security. Al
 Endpoints for searching doctors and lab tests.
 
 ### 1. Search Doctors
-`GET /api/doctors`
-*   **Query Params:** `query`, `specialization`, `sort`
-*   **Response:** Array of doctor objects (Name, Photo, Bio, Rating, Price).
+`GET /api/patients/doctors`
 
-### 2. Get All Lab Tests
-`GET /api/tests`
-*   **Description:** Returns availability and pricing for blood tests, scans, and panels.
+### 2. Find Laboratories
+`GET /api/patients/labs`
+
+### 3. Search Lab Tests
+`GET /api/patients/labs/:id/tests`
 
 ---
 
@@ -70,19 +67,33 @@ Unified engine for scheduling appointments and tests.
 
 ---
 
+## 👤 Patient Onboarding
+Comprehensive 4-step flow for profile completion.
+
+### 1. Unified Onboarding
+`PATCH /api/patients/health-profile`
+*   **Body Structure:**
+    ```json
+    {
+        "personalData": { ... },
+        "emergencyContact": { ... },
+        "healthProfile": { ... },
+        "lifestyle": { ... }
+    }
+    ```
+*   **Action:** Sets `isHealthProfileComplete: true` and unlocks full dashboard access.
+
+---
+
 ## 📂 Medical Records
 Detailed historical data including lab results and medication.
 
 ### 1. Lab Reports
-`GET /api/medical-records/lab-reports`
-*   **Status Mapping:** Maps internal results to "Good", "Borderline", or "Bad" for UI display.
+`GET /api/patients/reports`
+*   **Note:** Reports are doctor-verified before appearing here.
 
 ### 2. Prescriptions
-`GET /api/medical-records/prescriptions`
-*   **Tabs:** `actual` (current) or `history` (expired).
-*   **Actions:**
-    *   **Refill Request:** `POST /api/medical-records/prescriptions/:id/refill`
-    *   **Set Reminder:** `PUT /api/medical-records/prescriptions/:id/reminder`
+`GET /api/patients/prescriptions`
 
 ---
 

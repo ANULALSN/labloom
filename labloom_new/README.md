@@ -10,9 +10,9 @@ Labloom is a comprehensive healthcare application backend designed to manage lab
 - **Runtime:** Node.js
 - **Framework:** Express.js
 - **Database:** MongoDB (Mongoose ODM)
-- **Authentication:** JWT (JSON Web Tokens) with OTP Simulation
+- **Authentication:** JWT (JSON Web Tokens) with OTP (V2 Auth)
 - **Documentation:** Swagger (OpenAPI 3.0)
-- **Deployment:** Vercel
+- **Deployment:** Render (labloom.onrender.com)
 
 ## 📂 Project Structure
 ```text
@@ -51,7 +51,7 @@ Labloom/
 ### 5. Health Tracking & UI
 - **Vitals Monitoring:** Track Blood Pressure, Weight, Heart Rate, and Oxygen Saturation.
 - **Daily Habits:** Log Sleep and Water Intake.
-- **Premium Aesthetics**: Clean **White Aqua Blue** theme with glassmorphism and smooth transitions.
+- **Premium Aesthetics**: Professional **Green Healthcare** theme with clean typography and smooth transitions.
 
 ## 🔑 Authentication
 Most endpoints are protected. To access them:
@@ -63,14 +63,14 @@ Most endpoints are protected. To access them:
 
 | Feature | Method | Endpoint | Description |
 | :--- | :--- | :--- | :--- |
-| **Auth** | `POST` | `/api/auth/register` | Register new patient |
-| **Auth** | `POST` | `/api/auth/login-otp` | Request simulation OTP |
-| **Profile** | `PUT` | `/api/auth/profile` | Update health/personal data |
-| **Doctors** | `GET` | `/api/doctors` | List available specialists |
-| **Tests** | `GET` | `/api/tests` | Search lab tests |
-| **Bookings**| `POST` | `/api/bookings` | Create new appointment |
-| **Records** | `GET` | `/api/medical-records/lab-reports` | View test results |
-| **Pharma**  | `POST` | `/api/medical-records/prescriptions/:id/refill` | Request medicine refill |
+| **Auth** | `POST` | `/api/auth/v2/request-otp` | Request OTP for login |
+| **Auth** | `POST` | `/api/auth/v2/verify-otp` | Verify OTP & Get Tokens |
+| **Onboarding**| `PATCH` | `/api/patients/health-profile` | Unified 4-Step Patient Data |
+| **Profile** | `GET` | `/api/patients/me` | Fetch personal health data |
+| **Doctors** | `GET` | `/api/patients/doctors` | List available specialists |
+| **Labs** | `GET` | `/api/patients/labs` | Search available laboratories |
+| **Bookings**| `POST` | `/api/patients/bookings` | Create new appointment/test |
+| **Records** | `GET` | `/api/patients/reports` | View verified test results |
 
 ## 🛠 Installation & Local Setup
 
