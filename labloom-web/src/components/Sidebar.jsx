@@ -5,54 +5,54 @@ const navConfig = {
     admin: {
         label: 'Admin',
         items: [
-            { icon: '📊', label: 'Dashboard', path: '/admin' },
-            { icon: '👥', label: 'User Management', path: '/admin/users' },
-            { icon: '⏳', label: 'Pending Approvals', path: '/admin/approvals' },
-            { icon: '⭐', label: 'Platform Reviews', path: '/admin/reviews' },
+            { icon: '', label: 'Dashboard', path: '/admin' },
+            { icon: '', label: 'User Management', path: '/admin/users' },
+            { icon: '', label: 'Pending Approvals', path: '/admin/approvals' },
+            { icon: '', label: 'Platform Reviews', path: '/admin/reviews' },
         ]
     },
     patient: {
         label: 'Patient',
         items: [
-            { icon: '🏠', label: 'Dashboard', path: '/patient' },
-            { icon: '🩺', label: 'Find Doctors', path: '/patient/doctors' },
-            { icon: '🧪', label: 'Find Labs', path: '/patient/labs' },
-            { icon: '📅', label: 'My Appointments', path: '/patient/appointments' },
-            { icon: '📄', label: 'My Reports', path: '/patient/reports' },
-            { icon: '💬', label: 'Chat', path: '/patient/chat' },
-            { icon: '⭐', label: 'My Reviews', path: '/patient/reviews' },
-            { icon: '❤️', label: 'Health Profile', path: '/patient/profile' },
+            { icon: '', label: 'Dashboard', path: '/patient' },
+            { icon: '', label: 'Find Doctors', path: '/patient/doctors' },
+            { icon: '', label: 'Find Labs', path: '/patient/labs' },
+            { icon: '', label: 'My Appointments', path: '/patient/appointments' },
+            { icon: '', label: 'My Reports', path: '/patient/reports' },
+            { icon: '', label: 'Chat', path: '/patient/chat' },
+            { icon: '', label: 'My Reviews', path: '/patient/reviews' },
+            { icon: '', label: 'Health Profile', path: '/patient/profile' },
         ]
     },
     doctor: {
         label: 'Doctor',
         items: [
-            { icon: '📋', label: 'Appointments', path: '/doctor' },
-            { icon: '👥', label: 'My Patients', path: '/doctor/patients' },
-            { icon: '📄', label: 'Verify Reports', path: '/doctor/verify-reports' },
-            { icon: '📅', label: 'Manage Slots', path: '/doctor/slots' },
-            { icon: '💬', label: 'Messages', path: '/doctor/chat' },
-            { icon: '⭐', label: 'Reviews', path: '/doctor/reviews' },
+            { icon: '', label: 'Appointments', path: '/doctor' },
+            { icon: '', label: 'My Patients', path: '/doctor/patients' },
+            { icon: '', label: 'Verify Reports', path: '/doctor/verify-reports' },
+            { icon: '', label: 'Manage Slots', path: '/doctor/slots' },
+            { icon: '', label: 'Messages', path: '/doctor/chat' },
+            { icon: '', label: 'Reviews', path: '/doctor/reviews' },
         ]
     },
     hospital: {
         label: 'Hospital',
         items: [
-            { icon: '📊', label: 'Dashboard', path: '/hospital' },
-            { icon: '🩺', label: 'Doctors', path: '/hospital/doctors' },
-            { icon: '🕐', label: 'Slot Management', path: '/hospital/slots' },
-            { icon: '📅', label: 'Appointments', path: '/hospital/appointments' },
-            { icon: '💰', label: 'Finance', path: '/hospital/finance' },
-            { icon: '⭐', label: 'Reviews', path: '/hospital/reviews' },
+            { icon: '', label: 'Dashboard', path: '/hospital' },
+            { icon: '', label: 'Doctors', path: '/hospital/doctors' },
+            { icon: '', label: 'Slot Management', path: '/hospital/slots' },
+            { icon: '', label: 'Appointments', path: '/hospital/appointments' },
+            { icon: '', label: 'Finance', path: '/hospital/finance' },
+            { icon: '', label: 'Reviews', path: '/hospital/reviews' },
         ]
     },
     lab: {
         label: 'Laboratory',
         items: [
-            { icon: '📊', label: 'Dashboard', path: '/lab' },
-            { icon: '📅', label: 'Bookings', path: '/lab/bookings' },
-            { icon: '🧪', label: 'Manage Tests', path: '/lab/tests' },
-            { icon: '⭐', label: 'Reviews', path: '/lab/reviews' },
+            { icon: '', label: 'Dashboard', path: '/lab' },
+            { icon: '', label: 'Bookings', path: '/lab/bookings' },
+            { icon: '', label: 'Manage Tests', path: '/lab/tests' },
+            { icon: '', label: 'Reviews', path: '/lab/reviews' },
         ]
     },
 };
@@ -99,7 +99,7 @@ export default function Sidebar() {
                         <div className="user-name">{user?.name || 'User'}</div>
                         <div className="user-role">{user?.role || 'guest'}</div>
                     </div>
-                    <button className="btn-icon" onClick={handleLogout} title="Logout">🚪</button>
+                    <button className="btn-icon" onClick={handleLogout} title="Logout" style={{ fontSize: 13, color: '#ef4444' }}>Logout</button>
                 </div>
             </div>
         </aside>

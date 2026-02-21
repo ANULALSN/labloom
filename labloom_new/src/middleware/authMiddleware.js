@@ -76,7 +76,11 @@ const verifyDoctor = (req, res, next) => {
 
 const verifyLab = (req, res, next) => {
     if (req.user && req.user.role === 'lab') {
-        next();
+        if (req.user.privacyPolicyAccepted) {
+            next();
+        } else {
+            res.status(403).json({ message: 'Access denied. Lab account pending approval.' });
+        }
     } else {
         res.status(403).json({ message: 'Access denied. Lab only.' });
     }
@@ -84,7 +88,11 @@ const verifyLab = (req, res, next) => {
 
 const verifyHospital = (req, res, next) => {
     if (req.user && req.user.role === 'hospital') {
-        next();
+        if (req.user.privacyPolicyAccepted) {
+            next();
+        } else {
+            res.status(403).json({ message: 'Access denied. Hospital account pending approval.' });
+        }
     } else {
         res.status(403).json({ message: 'Access denied. Hospital only.' });
     }

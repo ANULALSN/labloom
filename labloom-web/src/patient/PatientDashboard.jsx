@@ -21,7 +21,7 @@ export default function PatientDashboard() {
                 <Topbar title="Patient Dashboard" />
                 <div className="page">
                     <div className="page-header">
-                        <h1>🏠 Dashboard</h1>
+                        <h1>Dashboard</h1>
                         <p>Welcome back! Here's your health overview</p>
                     </div>
 
@@ -31,22 +31,18 @@ export default function PatientDashboard() {
                         <>
                             <div className="stats-grid">
                                 <div className="stat-card">
-                                    <div className="stat-icon">📅</div>
                                     <div className="stat-label">Upcoming Appointments</div>
                                     <div className="stat-value">{dashboard?.upcomingAppointments || 0}</div>
                                 </div>
                                 <div className="stat-card">
-                                    <div className="stat-icon">✅</div>
                                     <div className="stat-label">Completed Visits</div>
                                     <div className="stat-value">{dashboard?.completedVisits || 0}</div>
                                 </div>
                                 <div className="stat-card">
-                                    <div className="stat-icon">📄</div>
                                     <div className="stat-label">Lab Reports</div>
                                     <div className="stat-value">{dashboard?.labReports || 0}</div>
                                 </div>
                                 <div className="stat-card">
-                                    <div className="stat-icon">💊</div>
                                     <div className="stat-label">Prescriptions</div>
                                     <div className="stat-value">{dashboard?.prescriptions || 0}</div>
                                 </div>
@@ -54,11 +50,11 @@ export default function PatientDashboard() {
 
                             <div className="grid-2">
                                 <div className="card">
-                                    <div className="card-header"><h3>⚡ Quick Actions</h3></div>
+                                    <div className="card-header"><h3>Quick Actions</h3></div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                                        <a href="/patient/doctors" className="btn btn-secondary" style={{ justifyContent: 'center' }}>🩺 Find a Doctor</a>
-                                        <a href="/patient/labs" className="btn btn-secondary" style={{ justifyContent: 'center' }}>🧪 Book a Lab Test</a>
-                                        <a href="/patient/appointments" className="btn btn-secondary" style={{ justifyContent: 'center' }}>📅 View My Appointments</a>
+                                        <a href="/patient/doctors" className="btn btn-secondary" style={{ justifyContent: 'center' }}>Find a Doctor</a>
+                                        <a href="/patient/labs" className="btn btn-secondary" style={{ justifyContent: 'center' }}>Book a Lab Test</a>
+                                        <a href="/patient/appointments" className="btn btn-secondary" style={{ justifyContent: 'center' }}>View My Appointments</a>
                                     </div>
                                 </div>
 
@@ -71,8 +67,8 @@ export default function PatientDashboard() {
                                                     <div>
                                                         <div className="fw-600 text-sm">
                                                             {b.bookingType === 'doctor'
-                                                                ? `🩺 Dr. ${b.doctor?.name || 'Doctor'} (${b.doctor?.doctorProfile?.specialization || 'Consultant'})`
-                                                                : `🧪 ${b.test?.name || 'Lab Test'}`}
+                                                                ? `Dr. ${b.doctor?.name || 'Doctor'} (${b.doctor?.doctorProfile?.specialization || 'Consultant'})`
+                                                                : `${b.test?.name || 'Lab Test'}`}
                                                         </div>
                                                         <div className="text-muted" style={{ fontSize: 11 }}>
                                                             {new Date(b.date).toLocaleDateString()} {b.lab?.name ? `• ${b.lab.name}` : ''}

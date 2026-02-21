@@ -22,6 +22,7 @@ POST   /api/auth/logout
 GET    /api/patients/dashboard
 GET    /api/patients/me
 PATCH  /api/patients/me
+PATCH  /api/patients/health-profile   (Unified Onboarding)
 GET    /api/patients/health-metrics?type={type}
 POST   /api/patients/health-metrics
 GET    /api/patients/appointments/me

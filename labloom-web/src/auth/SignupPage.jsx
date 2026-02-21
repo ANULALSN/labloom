@@ -78,17 +78,14 @@ export default function SignupPage() {
                         {/* Name */}
                         <div className="form-group">
                             <label>Full Name</label>
-                            <div className="form-input-icon">
-                                <span className="icon">👤</span>
-                                <input className="form-input" placeholder="Enter your full name" value={form.name} onChange={e => update('name', e.target.value)} />
-                            </div>
+                            <input className="form-input" placeholder="Enter your full name" value={form.name} onChange={e => update('name', e.target.value)} />
                         </div>
 
                         {/* Phone */}
                         <div className="form-group">
                             <label>Mobile Number</label>
                             <div className="phone-row">
-                                <div className="phone-prefix">🇮🇳 +91</div>
+                                <div className="phone-prefix">+91</div>
                                 <input className="form-input" type="tel" placeholder="Enter phone number" value={form.phone} onChange={e => update('phone', e.target.value)} />
                             </div>
                         </div>
@@ -96,10 +93,7 @@ export default function SignupPage() {
                         {/* Email */}
                         <div className="form-group">
                             <label>Email Address</label>
-                            <div className="form-input-icon">
-                                <span className="icon">✉️</span>
-                                <input className="form-input" type="email" placeholder="example@domain.com" value={form.email} onChange={e => update('email', e.target.value)} />
-                            </div>
+                            <input className="form-input" type="email" placeholder="example@domain.com" value={form.email} onChange={e => update('email', e.target.value)} />
                         </div>
 
                         {/* Terms */}
@@ -109,7 +103,7 @@ export default function SignupPage() {
                         </div>
 
                         <button type="submit" className="auth-btn" disabled={loading}>
-                            {loading ? '⏳ Creating...' : 'Create Account'}
+                            {loading ? 'Creating...' : 'Create Account'}
                         </button>
                     </form>
 

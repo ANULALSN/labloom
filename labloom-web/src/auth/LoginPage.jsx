@@ -73,10 +73,10 @@ export default function LoginPage() {
                     {/* User / Admin toggle */}
                     <div className="auth-toggle">
                         <button className={mode === 'user' ? 'active' : ''} onClick={() => { setMode('user'); setStep(1); setOtp(''); }}>
-                            🧑 User Login
+                            User Login
                         </button>
                         <button className={mode === 'admin' ? 'active' : ''} onClick={() => { setMode('admin'); setStep(1); setOtp(''); }}>
-                            🔑 Admin Login
+                            Admin Login
                         </button>
                     </div>
 
@@ -85,7 +85,7 @@ export default function LoginPage() {
                         <div className="form-group">
                             <label>Mobile Number</label>
                             <div className="phone-row">
-                                <div className="phone-prefix">🇮🇳 +91</div>
+                                <div className="phone-prefix">+91</div>
                                 <input
                                     className="form-input"
                                     type="tel"
@@ -102,7 +102,6 @@ export default function LoginPage() {
                             <div className="form-group">
                                 <label>OTP Verification Code</label>
                                 <div className="form-input-icon">
-                                    <span className="icon">🔐</span>
                                     <input
                                         className="form-input"
                                         type="text"
@@ -117,7 +116,7 @@ export default function LoginPage() {
                         )}
 
                         <button type="submit" className="auth-btn" disabled={loading}>
-                            {loading ? '⏳ Please wait...' : step === 1 ? '📲 Send OTP' : '✅ Verify & Login'}
+                            {loading ? 'Please wait...' : step === 1 ? 'Send OTP' : 'Verify & Login'}
                         </button>
 
                         {step === 2 && (

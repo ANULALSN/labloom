@@ -51,32 +51,26 @@ export default function LandingPage() {
             <section className="features-section" id="features">
                 <div className="features-grid">
                     <div className="feature-card">
-                        <div className="feature-icon">🩺</div>
                         <h3>Find Doctors</h3>
                         <p>Book appointments with verified specialists. Video and in-person consultations available.</p>
                     </div>
                     <div className="feature-card">
-                        <div className="feature-icon">🧪</div>
                         <h3>Lab Diagnostics</h3>
                         <p>Browse labs, book tests, and access digital reports — all in one seamless platform.</p>
                     </div>
                     <div className="feature-card">
-                        <div className="feature-icon">🏥</div>
                         <h3>Hospital Network</h3>
                         <p>Connected hospital ecosystem with real-time slot management and financial analytics.</p>
                     </div>
                     <div className="feature-card">
-                        <div className="feature-icon">📊</div>
                         <h3>Smart Reports</h3>
                         <p>AI-powered report analysis with instant digital access to your complete health records.</p>
                     </div>
                     <div className="feature-card">
-                        <div className="feature-icon">💬</div>
                         <h3>Secure Chat</h3>
                         <p>HIPAA-compliant messaging with your healthcare providers. 7-day post-consultation access.</p>
                     </div>
                     <div className="feature-card">
-                        <div className="feature-icon">🔒</div>
                         <h3>Data Privacy</h3>
                         <p>Enterprise-grade security with end-to-end encryption and full regulatory compliance.</p>
                     </div>

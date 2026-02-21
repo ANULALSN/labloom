@@ -1609,7 +1609,8 @@ textarea {
 }
 
 .step-dot {
-  width: 40px;
+  width: 25px;
+  /* Reduced for 4 steps */
   height: 6px;
   background: #e2e8f0;
   border-radius: 10px;
@@ -1618,6 +1619,10 @@ textarea {
 
 .step-dot.active {
   background: #27ae9e;
+}
+
+.flex-column {
+  flex-direction: column;
 }
 
 .assessment-form-group {

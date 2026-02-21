@@ -93,8 +93,9 @@ const signup = async (req, res) => {
             user.entityModel = 'Lab';
             await user.save();
         }
-        // If doctor, don't return tokens immediately, require approval
-        if (user.role === 'doctor') {
+        // For restricted roles (doctor, lab, hospital), don't return tokens immediately, require approval
+        const restrictedRoles = ['doctor', 'lab', 'hospital'];
+        if (restrictedRoles.includes(user.role)) {
             return res.status(201).json({
                 _id: user.id,
                 name: user.name,
@@ -105,7 +106,7 @@ const signup = async (req, res) => {
             });
         }
 
-        // Generate tokens
+        // Generate tokens for patients
         const accessToken = generateAccessToken(user.id, user.role);
         const refreshToken = generateRefreshToken();
 

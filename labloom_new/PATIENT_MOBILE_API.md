@@ -15,11 +15,47 @@ All requests should use JSON headers. Protected routes require `Authorization: B
 ## 🏠 Dashboard & Profile
 | Feature | Method | Endpoint | Description |
 | :--- | :--- | :--- | :--- |
+| **Complete Onboarding**| `PATCH`| `/api/patients/health-profile` | **Unified Onboarding (Step 1-4)** |
 | **Dashboard** | `GET` | `/api/patients/dashboard` | Counts of visits, reports, prescriptions |
 | **My Profile** | `GET` | `/api/patients/me` | Fetch personal and health profiling |
-| **Update Profile**| `PATCH`| `/api/patients/me` | Update health stats, address, etc. |
+| **Update Basic Info**| `PATCH`| `/api/patients/me` | Update health stats, address, etc. |
 | **Vitals History**| `GET` | `/api/patients/health-metrics` | Query `?type=bp` or `?type=all` |
 | **Log Vital** | `POST` | `/api/patients/health-metrics` | Log weight, BP, Heart rate, etc. |
+
+### 📋 Onboarding Payload Structure
+Used for the 4-step initial registration flow:
+```json
+{
+  "personalData": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "dob": "1990-01-01",
+    "phone": "+919876543210",
+    "city": "Mumbai",
+    "address": "123 Green Street"
+  },
+  "emergencyContact": {
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "relationship": "Spouse",
+    "phone": "+919988776655"
+  },
+  "healthProfile": {
+    "bloodType": "O",
+    "rhFactor": "+",
+    "allergies": "Peanuts",
+    "height": 175,
+    "weight": 70,
+    "bloodPressure": { "systolic": 120, "diastolic": 80 }
+  },
+  "lifestyle": {
+    "smoking": "No",
+    "alcohol": "Occasionally",
+    "activityLevel": "Moderate"
+  }
+}
+```
+*Note: Successful completion sets `isHealthProfileComplete: true` on the user object.*
 
 ## 🩺 Doctor & Hospital Discovery
 | Feature | Method | Endpoint | Description |

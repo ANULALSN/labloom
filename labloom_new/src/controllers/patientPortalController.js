@@ -359,16 +359,51 @@ const getAllReviews = async (req, res) => {
 // @access  Private (Patient)
 const updateHealthProfile = async (req, res) => {
     try {
-        const { healthProfile, lifestyle } = req.body;
+        const { personalData, emergencyContact, healthProfile, lifestyle } = req.body;
         const user = await User.findById(req.user.id);
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        if (healthProfile) {
-            user.healthProfile = { ...user.healthProfile, ...healthProfile };
+        // 1. Personal Data
+        if (personalData) {
+            user.firstName = personalData.firstName || user.firstName;
+            user.lastName = personalData.lastName || user.lastName;
+            user.dob = personalData.dob || user.dob;
+            user.phone = personalData.phone || user.phone;
+            user.email = personalData.email || user.email;
+            user.city = personalData.city || user.city;
+            user.address = personalData.address || user.address;
+            user.name = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.name;
         }
+
+        // 2. Emergency Contact
+        if (emergencyContact) {
+            user.emergencyContact = {
+                firstName: emergencyContact.firstName || user.emergencyContact?.firstName,
+                lastName: emergencyContact.lastName || user.emergencyContact?.lastName,
+                relationship: emergencyContact.relationship || user.emergencyContact?.relationship,
+                phone: emergencyContact.phone || user.emergencyContact?.phone,
+                email: emergencyContact.email || user.emergencyContact?.email,
+                city: emergencyContact.city || user.emergencyContact?.city,
+                address: emergencyContact.address || user.emergencyContact?.address
+            };
+        }
+
+        // 3. Health Profile
+        if (healthProfile) {
+            user.healthProfile = {
+                ...user.healthProfile,
+                ...healthProfile,
+                bloodPressure: {
+                    systolic: healthProfile.bloodPressure?.systolic || user.healthProfile?.bloodPressure?.systolic,
+                    diastolic: healthProfile.bloodPressure?.diastolic || user.healthProfile?.bloodPressure?.diastolic
+                }
+            };
+        }
+
+        // 4. Lifestyle
         if (lifestyle) {
             user.lifestyle = { ...user.lifestyle, ...lifestyle };
         }
@@ -377,11 +412,23 @@ const updateHealthProfile = async (req, res) => {
         await user.save();
 
         res.json({
-            message: 'Health profile updated successfully',
+            message: 'Onboarding completed successfully',
             user: {
+                _id: user._id,
+                name: user.name,
+                role: user.role,
+                phone: user.phone,
+                isHealthProfileComplete: user.isHealthProfileComplete,
+                personalData: {
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    dob: user.dob,
+                    city: user.city,
+                    address: user.address
+                },
+                emergencyContact: user.emergencyContact,
                 healthProfile: user.healthProfile,
-                lifestyle: user.lifestyle,
-                isHealthProfileComplete: user.isHealthProfileComplete
+                lifestyle: user.lifestyle
             }
         });
     } catch (error) {

@@ -23,6 +23,7 @@
 | GET | `/dashboard` | ✅ | Get patient dashboard |
 | GET | `/me` | ✅ | Get patient profile |
 | PATCH | `/me` | ✅ | Update patient profile |
+| PATCH | `/health-profile` | ✅ | Unified Onboarding (4 Steps) |
 | GET | `/health-metrics?type={type}` | ✅ | Get health metrics history |
 | POST | `/health-metrics` | ✅ | Add new health metric |
 | GET | `/appointments/me` | ✅ | Get my appointments |
@@ -109,10 +110,42 @@
 {
   "name": "John Doe",
   "email": "john@example.com",
-  "phone": "+1234567890",
-  "password": "securepass123",
+  "phone": "+919876543210",
   "role": "patient",
   "privacyPolicyAccepted": true
+}
+```
+
+### Complete Onboarding (PATCH /api/patients/health-profile)
+```json
+{
+  "personalData": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "dob": "1990-01-01",
+    "phone": "+919876543210",
+    "city": "Mumbai",
+    "address": "123 Green Street"
+  },
+  "emergencyContact": {
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "relationship": "Spouse",
+    "phone": "+919988776655"
+  },
+  "healthProfile": {
+    "bloodType": "O",
+    "rhFactor": "+",
+    "allergies": "Peanuts",
+    "height": 175,
+    "weight": 70,
+    "bloodPressure": { "systolic": 120, "diastolic": 80 }
+  },
+  "lifestyle": {
+    "smoking": "No",
+    "alcohol": "Occasionally",
+    "activityLevel": "Moderate"
+  }
 }
 ```
 

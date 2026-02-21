@@ -21,7 +21,7 @@ export default function AdminDashboard() {
                 <Topbar title="Admin Dashboard" />
                 <div className="page">
                     <div className="page-header">
-                        <h1>📊 Dashboard</h1>
+                        <h1>Dashboard</h1>
                         <p>Platform overview and system analytics</p>
                     </div>
 
@@ -31,22 +31,18 @@ export default function AdminDashboard() {
                         <>
                             <div className="stats-grid">
                                 <div className="stat-card">
-                                    <div className="stat-icon">🧑</div>
                                     <div className="stat-label">Patients</div>
                                     <div className="stat-value">{stats.users?.patients || 0}</div>
                                 </div>
                                 <div className="stat-card">
-                                    <div className="stat-icon">🩺</div>
                                     <div className="stat-label">Doctors</div>
                                     <div className="stat-value">{stats.users?.doctors || 0}</div>
                                 </div>
                                 <div className="stat-card">
-                                    <div className="stat-icon">🏥</div>
                                     <div className="stat-label">Hospitals</div>
                                     <div className="stat-value">{stats.users?.hospitals || 0}</div>
                                 </div>
                                 <div className="stat-card">
-                                    <div className="stat-icon">🧪</div>
                                     <div className="stat-label">Labs</div>
                                     <div className="stat-value">{stats.users?.labs || 0}</div>
                                 </div>
@@ -54,7 +50,7 @@ export default function AdminDashboard() {
 
                             <div className="grid-2">
                                 <div className="card">
-                                    <div className="card-header"><h3>📅 Activity</h3></div>
+                                    <div className="card-header"><h3>Activity</h3></div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                                         <div className="flex-between">
                                             <span className="text-muted text-sm">Appointments</span>
@@ -72,7 +68,7 @@ export default function AdminDashboard() {
                                 </div>
 
                                 <div className="card">
-                                    <div className="card-header"><h3>💰 Revenue Model</h3></div>
+                                    <div className="card-header"><h3>Revenue Model</h3></div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                                         <div className="flex-between">
                                             <span className="text-muted text-sm">Doctor Booking Fee</span>
@@ -92,7 +88,6 @@ export default function AdminDashboard() {
                         </>
                     ) : (
                         <div className="empty-state">
-                            <div className="empty-icon">📊</div>
                             <h3>No data yet</h3>
                             <p>Analytics will appear as users register and book appointments</p>
                         </div>

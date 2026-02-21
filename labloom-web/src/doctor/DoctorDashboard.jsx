@@ -49,7 +49,7 @@ export default function DoctorDashboard() {
                 <Topbar title="Appointments" />
                 <div className="page">
                     <div className="page-header">
-                        <h1>📋 Appointments</h1>
+                        <h1>Appointments</h1>
                         <p>Your schedule and patient appointments</p>
                     </div>
 
@@ -79,15 +79,15 @@ export default function DoctorDashboard() {
                                             <td>{statusBadge(a.status)}</td>
                                             <td>
                                                 <div className="flex gap-8">
-                                                    <button className="btn btn-secondary btn-sm" onClick={() => setSelectedPatient(a.user)}>ℹ️ View Info</button>
+                                                    <button className="btn btn-secondary btn-sm" onClick={() => setSelectedPatient(a.user)}>View Info</button>
                                                     {a.status === 'pending' && (
-                                                        <button className="btn btn-success btn-sm" onClick={() => updateStatus(a._id, 'confirmed')}>✅ Confirm</button>
+                                                        <button className="btn btn-success btn-sm" onClick={() => updateStatus(a._id, 'confirmed')}>Confirm</button>
                                                     )}
                                                     {a.status === 'confirmed' && (
-                                                        <button className="btn btn-primary btn-sm" onClick={() => updateStatus(a._id, 'completed')}>✔ Complete</button>
+                                                        <button className="btn btn-primary btn-sm" onClick={() => updateStatus(a._id, 'completed')}>Complete</button>
                                                     )}
                                                     {['pending', 'confirmed'].includes(a.status) && (
-                                                        <button className="btn btn-danger btn-sm" onClick={() => updateStatus(a._id, 'cancelled')}>✕</button>
+                                                        <button className="btn btn-danger btn-sm" onClick={() => updateStatus(a._id, 'cancelled')}>Remove</button>
                                                     )}
                                                 </div>
                                             </td>
@@ -97,7 +97,7 @@ export default function DoctorDashboard() {
                             </table>
                         </div>
                     ) : (
-                        <div className="empty-state"><div className="empty-icon">📋</div><h3>No appointments</h3><p>Your patient appointments will appear here</p></div>
+                        <div className="empty-state"><h3>No appointments</h3><p>Your patient appointments will appear here</p></div>
                     )}
                 </div>
             </div>
