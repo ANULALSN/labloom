@@ -17,7 +17,8 @@ const {
     removeFromCatalog,
     getLabStaff,
     addLabStaff,
-    updateLabSettings
+    updateLabSettings,
+    sendEmailReport
 } = require('../controllers/labPortalController');
 const { protect, verifyLab, authorizeRoles } = require('../middleware/authMiddleware');
 
@@ -150,6 +151,7 @@ router.patch('/bookings/:id/status', updateLabStatus);
  *       200: { description: Report uploaded }
  */
 router.post('/bookings/:id/upload-report', reportUpload.single('report'), uploadBookingReport);
+router.post('/bookings/:id/send-email', sendEmailReport);
 
 /**
  * @swagger

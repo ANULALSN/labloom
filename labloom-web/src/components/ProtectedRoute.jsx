@@ -19,8 +19,13 @@ export default function ProtectedRoute({ children, allowedRoles }) {
 
     if (allowedRoles && !allowedRoles.includes(user.role)) {
         // Redirect to the user's own portal
-        const portalMap = { admin: '/admin', patient: '/patient', doctor: '/doctor', hospital: '/hospital' };
+        const portalMap = { admin: '/admin', patient: '/patient', doctor: '/doctor', hospital: '/hospital', lab: '/lab' };
         return <Navigate to={portalMap[user.role] || '/login'} replace />;
+    }
+
+    // New patient health assessment check
+    if (user.role === 'patient' && !user.isHealthProfileComplete && window.location.pathname !== '/patient/assessment') {
+        return <Navigate to="/patient/assessment" replace />;
     }
 
     return children;

@@ -18,6 +18,14 @@ const reviewSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Hospital'
     },
+    targetType: {
+        type: String,
+        enum: ['lab', 'doctor', 'hospital'],
+        required: true
+    },
+    targetName: {
+        type: String
+    },
     rating: {
         type: Number,
         required: true,

@@ -3,11 +3,13 @@ import api from '../api/client';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/Topbar';
 import { useToast } from '../components/Toast';
+import HealthInfoModal from '../components/HealthInfoModal';
 
 export default function DoctorDashboard() {
     const [appointments, setAppointments] = useState([]);
     const [filter, setFilter] = useState('');
     const [loading, setLoading] = useState(true);
+    const [selectedPatient, setSelectedPatient] = useState(null);
     const toast = useToast();
 
     const fetchAppointments = async () => {
@@ -77,6 +79,7 @@ export default function DoctorDashboard() {
                                             <td>{statusBadge(a.status)}</td>
                                             <td>
                                                 <div className="flex gap-8">
+                                                    <button className="btn btn-secondary btn-sm" onClick={() => setSelectedPatient(a.user)}>ℹ️ View Info</button>
                                                     {a.status === 'pending' && (
                                                         <button className="btn btn-success btn-sm" onClick={() => updateStatus(a._id, 'confirmed')}>✅ Confirm</button>
                                                     )}
@@ -98,6 +101,7 @@ export default function DoctorDashboard() {
                     )}
                 </div>
             </div>
+            {selectedPatient && <HealthInfoModal patient={selectedPatient} onClose={() => setSelectedPatient(null)} />}
         </div>
     );
 }

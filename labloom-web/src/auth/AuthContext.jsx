@@ -44,7 +44,13 @@ export function AuthProvider({ children }) {
     const signup = async (formData) => {
         const data = await api.post('/api/auth/v2/signup', formData, true);
         if (data.accessToken) {
-            const userData = { _id: data._id, name: data.name, role: data.role, phone: data.phone };
+            const userData = {
+                _id: data._id,
+                name: data.name,
+                role: data.role,
+                phone: data.phone,
+                isHealthProfileComplete: data.isHealthProfileComplete
+            };
             saveUser(userData, data.accessToken);
         }
         return data;
@@ -58,7 +64,13 @@ export function AuthProvider({ children }) {
     const verifyOtp = async (phone, otp) => {
         const data = await api.post('/api/auth/v2/verify-otp', { phone, otp }, true);
         if (data.accessToken) {
-            const userData = { _id: data._id || data.user?._id, name: data.name || data.user?.name, role: data.role || data.user?.role, phone };
+            const userData = {
+                _id: data._id || data.user?._id,
+                name: data.name || data.user?.name,
+                role: data.role || data.user?.role,
+                phone,
+                isHealthProfileComplete: data.isHealthProfileComplete
+            };
             saveUser(userData, data.accessToken);
         }
         return data;
@@ -70,7 +82,7 @@ export function AuthProvider({ children }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, adminRequestOtp, adminVerifyOtp, signup, requestOtp, verifyOtp, logout }}>
+        <AuthContext.Provider value={{ user, setUser, loading, adminRequestOtp, adminVerifyOtp, signup, requestOtp, verifyOtp, logout }}>
             {children}
         </AuthContext.Provider>
     );

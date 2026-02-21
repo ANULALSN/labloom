@@ -41,16 +41,8 @@ router.get('/', getDoctors);
  */
 router.get('/search', searchDoctors);
 
-/**
- * @swagger
- * /api/doctors/seed:
- *   post:
- *     summary: Seed sample doctors (Dev only)
- *     tags: [Doctors]
- *     responses:
- *       200: { description: Seeded doctors }
- */
-router.post('/seed', seedDoctors);
+// router.post('/seed', seedDoctors); // Disabled to prevent dummy data
+
 
 /**
  * @swagger

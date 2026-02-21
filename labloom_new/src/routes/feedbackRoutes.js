@@ -1,7 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { submitFeedback, getReviews } = require('../controllers/patientPortalController');
 const { protect } = require('../middleware/authMiddleware');
+const {
+    submitFeedback,
+    getReviews,
+    getMyReviews,
+    getAllReviews
+} = require('../controllers/patientPortalController');
 
 /**
  * @swagger
@@ -36,6 +41,26 @@ router.post('/submit', protect, submitFeedback);
 
 /**
  * @swagger
+ * /api/feedback/my:
+ *   get:
+ *     summary: Get reviews given by current user
+ *     tags: [Feedback]
+ *     security: [{ bearerAuth: [] }]
+ */
+router.get('/my', protect, getMyReviews);
+
+/**
+ * @swagger
+ * /api/feedback/all:
+ *   get:
+ *     summary: Get all reviews (Admin only)
+ *     tags: [Feedback]
+ *     security: [{ bearerAuth: [] }]
+ */
+router.get('/all', protect, getAllReviews);
+
+/**
+ * @swagger
  * /api/feedback/{targetId}:
  *   get:
  *     summary: Retrieve reviews for a specific entity
@@ -55,7 +80,6 @@ router.post('/submit', protect, submitFeedback);
 router.get('/:targetId', async (req, res) => {
     // Adapt path param to query param for the shared controller
     req.query.targetId = req.params.targetId;
-    const { getReviews } = require('../controllers/patientPortalController');
     return getReviews(req, res);
 });
 

@@ -8,6 +8,7 @@ const {
     getDoctorSlots,
     submitFeedback,
     getReviews,
+    updateHealthProfile,
     uploadProfileImage
 } = require('../controllers/patientPortalController');
 const { getMe, updateProfile } = require('../controllers/authV2Controller');
@@ -65,6 +66,7 @@ router.get('/me', protect, getMe);
  *       200: { description: Profile updated }
  */
 router.patch('/me', protect, updateProfile);
+router.patch('/health-profile', protect, updateHealthProfile);
 
 /**
  * @swagger

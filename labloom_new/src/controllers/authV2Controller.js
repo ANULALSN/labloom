@@ -207,6 +207,7 @@ const verifyOtp = async (req, res) => {
             email: user.email,
             phone: user.phone,
             role: user.role,
+            isHealthProfileComplete: user.isHealthProfileComplete,
             accessToken,
             refreshToken
         });

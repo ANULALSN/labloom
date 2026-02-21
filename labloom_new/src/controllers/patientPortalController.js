@@ -65,8 +65,8 @@ const getPatientDashboard = async (req, res) => {
 const getLabs = async (req, res) => {
     try {
         const { city, search } = req.query;
-        // Show approved labs and pending labs (registered via signup)
-        let filter = { verificationStatus: { $in: ['approved', 'pending'] } };
+        // Show ONLY approved labs
+        let filter = { verificationStatus: 'approved' };
 
         if (city && city !== 'All') {
             filter['address.city'] = { $regex: city, $options: 'i' };
@@ -226,7 +226,7 @@ const getDoctorSlots = async (req, res) => {
 // @access  Private
 const submitFeedback = async (req, res) => {
     try {
-        const { targetId, targetType, rating, comment } = req.body;
+        const { targetId, targetType, targetName, rating, comment } = req.body;
         // targetType: 'doctor', 'lab', 'hospital'
 
         if (!targetId || !targetType || !rating || !comment) {
@@ -235,6 +235,8 @@ const submitFeedback = async (req, res) => {
 
         const reviewData = {
             user: req.user.id,
+            targetType,
+            targetName,
             rating,
             comment
         };
@@ -319,6 +321,74 @@ const uploadProfileImage = async (req, res) => {
     }
 };
 
+// @desc    Get reviews given by the current user
+// @route   GET /api/feedback/my
+// @access  Private (Patient)
+const getMyReviews = async (req, res) => {
+    try {
+        const reviews = await Review.find({ user: req.user.id })
+            .populate('doctor', 'name')
+            .populate('lab', 'name')
+            .populate('hospital', 'name')
+            .sort({ createdAt: -1 });
+        res.json(reviews);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Get all reviews (for admin)
+// @route   GET /api/feedback/all
+// @access  Private (Admin)
+const getAllReviews = async (req, res) => {
+    try {
+        const reviews = await Review.find()
+            .populate('user', 'name')
+            .populate('doctor', 'name')
+            .populate('lab', 'name')
+            .populate('hospital', 'name')
+            .sort({ createdAt: -1 });
+        res.json(reviews);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Update patient health and lifestyle profile
+// @route   PATCH /api/patients/health-profile
+// @access  Private (Patient)
+const updateHealthProfile = async (req, res) => {
+    try {
+        const { healthProfile, lifestyle } = req.body;
+        const user = await User.findById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        if (healthProfile) {
+            user.healthProfile = { ...user.healthProfile, ...healthProfile };
+        }
+        if (lifestyle) {
+            user.lifestyle = { ...user.lifestyle, ...lifestyle };
+        }
+
+        user.isHealthProfileComplete = true;
+        await user.save();
+
+        res.json({
+            message: 'Health profile updated successfully',
+            user: {
+                healthProfile: user.healthProfile,
+                lifestyle: user.lifestyle,
+                isHealthProfileComplete: user.isHealthProfileComplete
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     getPatientDashboard,
     getLabs,
@@ -327,5 +397,8 @@ module.exports = {
     getDoctorSlots,
     submitFeedback,
     getReviews,
+    getMyReviews,
+    getAllReviews,
+    updateHealthProfile,
     uploadProfileImage
 };

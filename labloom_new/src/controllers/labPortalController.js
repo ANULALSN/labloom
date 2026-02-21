@@ -452,6 +452,40 @@ const updateLabSettings = async (req, res) => {
     }
 };
 
+// @desc    Send test report via email to patient
+// @route   POST /api/lab/bookings/:id/send-email
+// @access  Private (Lab staff)
+const sendEmailReport = async (req, res) => {
+    try {
+        const booking = await Booking.findById(req.params.id).populate('user', 'name email').populate('test', 'name').populate('lab', 'name');
+
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+
+        if (!booking.labReport || !booking.labReport.reportUrl) {
+            return res.status(400).json({ message: 'Report is not uploaded yet' });
+        }
+
+        if (!booking.user?.email) {
+            return res.status(400).json({ message: 'Patient does not have an email address' });
+        }
+
+        // Simulating email sending logic
+        console.log(`--------------------------------------------------`);
+        console.log(`EMAIL SIMULATION:`);
+        console.log(`To: ${booking.user.email} (${booking.user.name})`);
+        console.log(`Subject: Your Test Report from ${booking.lab.name}`);
+        console.log(`Body: Hello ${booking.user.name}, your report for ${booking.test.name} is ready.`);
+        console.log(`Attachment: http://localhost:5000${booking.labReport.reportUrl}`);
+        console.log(`--------------------------------------------------`);
+
+        res.json({ message: `Report sent to ${booking.user.email}` });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     getLabBookings,
     getPendingBookings,
@@ -467,5 +501,6 @@ module.exports = {
     removeFromCatalog,
     getLabStaff,
     addLabStaff,
-    updateLabSettings
+    updateLabSettings,
+    sendEmailReport
 };

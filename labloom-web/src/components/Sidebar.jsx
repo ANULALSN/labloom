@@ -8,6 +8,7 @@ const navConfig = {
             { icon: '📊', label: 'Dashboard', path: '/admin' },
             { icon: '👥', label: 'User Management', path: '/admin/users' },
             { icon: '⏳', label: 'Pending Approvals', path: '/admin/approvals' },
+            { icon: '⭐', label: 'Platform Reviews', path: '/admin/reviews' },
         ]
     },
     patient: {
@@ -19,6 +20,8 @@ const navConfig = {
             { icon: '📅', label: 'My Appointments', path: '/patient/appointments' },
             { icon: '📄', label: 'My Reports', path: '/patient/reports' },
             { icon: '💬', label: 'Chat', path: '/patient/chat' },
+            { icon: '⭐', label: 'My Reviews', path: '/patient/reviews' },
+            { icon: '❤️', label: 'Health Profile', path: '/patient/profile' },
         ]
     },
     doctor: {
@@ -29,6 +32,7 @@ const navConfig = {
             { icon: '📄', label: 'Verify Reports', path: '/doctor/verify-reports' },
             { icon: '📅', label: 'Manage Slots', path: '/doctor/slots' },
             { icon: '💬', label: 'Messages', path: '/doctor/chat' },
+            { icon: '⭐', label: 'Reviews', path: '/doctor/reviews' },
         ]
     },
     hospital: {
@@ -39,6 +43,7 @@ const navConfig = {
             { icon: '🕐', label: 'Slot Management', path: '/hospital/slots' },
             { icon: '📅', label: 'Appointments', path: '/hospital/appointments' },
             { icon: '💰', label: 'Finance', path: '/hospital/finance' },
+            { icon: '⭐', label: 'Reviews', path: '/hospital/reviews' },
         ]
     },
     lab: {
@@ -47,6 +52,7 @@ const navConfig = {
             { icon: '📊', label: 'Dashboard', path: '/lab' },
             { icon: '📅', label: 'Bookings', path: '/lab/bookings' },
             { icon: '🧪', label: 'Manage Tests', path: '/lab/tests' },
+            { icon: '⭐', label: 'Reviews', path: '/lab/reviews' },
         ]
     },
 };
@@ -64,7 +70,7 @@ export default function Sidebar() {
     return (
         <aside className="sidebar">
             <div className="sidebar-logo">
-                <img src="/logo.jpeg" alt="Labloom" style={{ width: 32, height: 32 }} />
+                <img src="/logo.png" alt="Labloom" style={{ width: 32, height: 32 }} />
                 <div>
                     <h2>Labloom</h2>
                     <span className="role-badge">{config.label}</span>

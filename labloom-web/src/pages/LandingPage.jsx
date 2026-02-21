@@ -8,16 +8,14 @@ export default function LandingPage() {
             {/* ── Navbar ── */}
             <nav className="landing-navbar">
                 <div className="nav-logo">
-                    <img src="/logo.jpeg" alt="Labloom" />
+                    <img src="/logo.png" alt="Labloom" />
                     <h1>Labloom</h1>
                 </div>
                 <div className="nav-links">
                     <a href="#features">Solutions</a>
                     <a href="#about">About</a>
                     <a href="#contact">Contact</a>
-                </div>
-                <div className="nav-actions">
-                    <button className="nav-btn-login" onClick={() => navigate('/login')}>Login</button>
+                    <a onClick={() => navigate('/login')} style={{ cursor: 'pointer' }}>Login</a>
                     <button className="nav-btn-signup" onClick={() => navigate('/signup')}>Sign Up</button>
                 </div>
             </nav>
@@ -45,10 +43,7 @@ export default function LandingPage() {
                 </div>
 
                 <div className="hero-image">
-                    <div className="hero-img-placeholder">
-                        <div className="hero-icon">🔬</div>
-                        <p>Precision Medical Diagnostics</p>
-                    </div>
+                    <img src="/landing.jpg" alt="Labloom Medical" />
                 </div>
             </section>
 
@@ -97,7 +92,7 @@ export default function LandingPage() {
                 fontSize: 14
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 12 }}>
-                    <img src="/logo.jpeg" alt="Labloom" style={{ width: 24, height: 24 }} />
+                    <img src="/logo.png" alt="Labloom" style={{ width: 24, height: 24 }} />
                     <span style={{ color: '#00cec9', fontWeight: 700, fontSize: 18 }}>Labloom</span>
                 </div>
                 <p>© 2026 Labloom Healthcare. All rights reserved.</p>

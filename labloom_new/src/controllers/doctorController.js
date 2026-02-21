@@ -8,10 +8,7 @@ const User = require('../models/User');
 // @access  Public
 const getDoctors = async (req, res) => {
     try {
-        // 1. Standalone Doctor collection entries
-        const catalogDoctors = await Doctor.find({});
-
-        // 2. Registered users with role='doctor' who are approved (privacyPolicyAccepted = true)
+        // ONLY Registered users with role='doctor' who are approved (privacyPolicyAccepted = true)
         const userDoctors = await User.find({
             role: 'doctor',
             privacyPolicyAccepted: true
@@ -23,16 +20,15 @@ const getDoctors = async (req, res) => {
             name: u.name,
             specialization: u.doctorProfile?.specialization || 'General Physician',
             rating: u.doctorProfile?.rating || 0,
-            reviewsCount: 0,
+            reviewsCount: u.doctorProfile?.reviewsCount || 0,
             price: u.doctorProfile?.consultationFee || 500,
             location: u.doctorProfile?.currentWorkingPlace || 'Not specified',
             phone: u.phone,
-            _source: 'user' // mark source for frontend to differentiate if needed
+            image: u.image || 'https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-closed-posture_409827-254.jpg',
+            _source: 'user'
         }));
 
-        // Merge both lists (catalog first, then user-doctors)
-        const all = [...catalogDoctors, ...normalizedUserDocs];
-        res.json(all);
+        res.json(normalizedUserDocs);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -191,60 +187,10 @@ const getDoctorById = async (req, res) => {
     }
 };
 
-// @desc    Seed sample doctors
-// @route   POST /api/doctors/seed
-// @access  Public (Dev only)
-const seedDoctors = async (req, res) => {
-    await Doctor.deleteMany({});
-
-    const sampleDoctors = [
-        {
-            name: 'Dr. Charlotte Elizabeth Montgomery',
-            specialization: 'Cardiologist',
-            rating: 4.9,
-            reviewsCount: 120,
-            price: 80,
-            image: 'https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-closed-posture_409827-254.jpg',
-            location: 'Mercy Heart Institute, 123 Main St, Boston',
-            about: {
-                generalInfo: 'Dr. Charlotte is an experienced cardiologist, she specializes in preventive cardiology, heart failure management, and advanced cardiac imaging.',
-                currentWorkingPlace: 'Mercy Heart Institute, 123 Main St, Boston',
-                education: 'Doctor of Medicine (MD), Johns Hopkins University.',
-                certification: 'Board-certified in Cardiology by the American Board of Internal Medicine.',
-                training: 'Completed residency and advanced cardiology fellowship at the Cleveland Clinic.',
-                licensure: 'Fully licensed to practice medicine and cardiology in multiple states.',
-                experience: 'Over 12 years of clinical practice, specializing in preventive care.'
-            }
-        },
-        {
-            name: 'Dr. Ayesha Khalid',
-            specialization: 'Dermatologist',
-            rating: 4.8,
-            reviewsCount: 95,
-            price: 60,
-            image: 'https://img.freepik.com/free-photo/woman-doctor-wearing-lab-coat-with-stethoscope-isolated_1303-29791.jpg',
-            location: 'Skin Care Clinic, New York',
-            about: {
-                generalInfo: 'Expert in clinical and cosmetic dermatology.',
-                currentWorkingPlace: 'Skin Care Clinic, New York',
-                education: 'MD from Harvard Medical School',
-                certification: 'Board Certified Dermatologist',
-                training: 'Residency at Mayo Clinic',
-                licensure: 'Licensed in NY and CA',
-                experience: '8 years of experience in treating skin conditions.'
-            }
-        }
-    ];
-
-    const createdDoctors = await Doctor.insertMany(sampleDoctors);
-    res.json(createdDoctors);
-};
-
 module.exports = {
     getDoctors,
     searchDoctors,
     getDoctorDetails,
     getDoctorSlots,
-    getDoctorById,
-    seedDoctors
+    getDoctorById
 };

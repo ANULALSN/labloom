@@ -3,21 +3,36 @@ import { Link } from 'react-router-dom';
 import api from '../api/client';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/Topbar';
+import FeedbackModal from '../components/FeedbackModal';
 
 export default function MyAppointments() {
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [feedbackTarget, setFeedbackTarget] = useState(null);
 
-    useEffect(() => {
+    const fetchBookings = () => {
+        setLoading(true);
         api.get('/api/patients/appointments/me')
             .then(data => setBookings(Array.isArray(data) ? data : []))
             .catch(() => setBookings([]))
             .finally(() => setLoading(false));
+    };
+
+    useEffect(() => {
+        fetchBookings();
     }, []);
 
     const statusBadge = (status) => {
         const map = { pending: 'badge-warning', confirmed: 'badge-info', completed: 'badge-success', cancelled: 'badge-danger' };
         return <span className={`badge ${map[status] || 'badge-info'}`}>{status}</span>;
+    };
+
+    const handleFeedbackClick = (booking) => {
+        const targetId = booking.bookingType === 'doctor' ? booking.doctor._id : booking.lab._id;
+        const targetType = booking.bookingType === 'doctor' ? 'doctor' : 'lab';
+        const targetName = booking.bookingType === 'doctor' ? booking.doctor.name : booking.lab.name;
+
+        setFeedbackTarget({ targetId, targetType, targetName });
     };
 
     return (
@@ -44,22 +59,36 @@ export default function MyAppointments() {
                                         <th>Mode</th>
                                         <th>Amount</th>
                                         <th>Status</th>
-                                        <th>Chat</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {bookings.map(b => (
                                         <tr key={b._id}>
-                                            <td className="fw-600">{b.bookingType === 'doctor' ? '🩺 Doctor' : '🧪 Lab Test'}</td>
+                                            <td className="fw-600">
+                                                {b.bookingType === 'doctor' ? '🩺 Doctor' : '🧪 Lab Test'}
+                                                <div className="text-muted text-sm">{b.bookingType === 'doctor' ? b.doctor?.name : b.lab?.name}</div>
+                                            </td>
                                             <td>{b.date ? new Date(b.date).toLocaleDateString() : '—'}</td>
                                             <td>{b.time || '—'}</td>
                                             <td className="text-muted">{b.appointmentMode || '—'}</td>
                                             <td>₹{b.amount || 0}</td>
                                             <td>{statusBadge(b.status)}</td>
                                             <td>
-                                                {['confirmed', 'completed'].includes(b.status) && (
-                                                    <Link to={`/patient/chat?bookingId=${b._id}`} className="btn btn-secondary btn-sm">💬</Link>
-                                                )}
+                                                <div className="flex gap-8">
+                                                    {['confirmed', 'completed'].includes(b.status) && (
+                                                        <Link to={`/patient/chat?bookingId=${b._id}`} className="btn btn-secondary btn-sm" title="Chat">💬</Link>
+                                                    )}
+                                                    {b.status === 'completed' && (
+                                                        <button
+                                                            className="btn btn-primary btn-sm"
+                                                            onClick={() => handleFeedbackClick(b)}
+                                                            title="Give Feedback"
+                                                        >
+                                                            ⭐
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}
@@ -75,6 +104,14 @@ export default function MyAppointments() {
                     )}
                 </div>
             </div>
+
+            <FeedbackModal
+                isOpen={!!feedbackTarget}
+                onClose={() => setFeedbackTarget(null)}
+                targetId={feedbackTarget?.targetId}
+                targetType={feedbackTarget?.targetType}
+                targetName={feedbackTarget?.targetName}
+            />
         </div>
     );
 }

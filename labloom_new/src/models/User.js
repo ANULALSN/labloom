@@ -143,6 +143,10 @@ const userSchema = mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    isHealthProfileComplete: {
+        type: Boolean,
+        default: false
     }
 });
 

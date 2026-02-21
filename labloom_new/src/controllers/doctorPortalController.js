@@ -27,7 +27,7 @@ const getDoctorAppointments = async (req, res) => {
         }
 
         const appointments = await Booking.find(filter)
-            .populate('user', 'name phone email image')
+            .populate('user', 'name phone email image healthProfile lifestyle')
             .sort({ date: 1, time: 1 });
 
         // Map to add patientId alias for frontend compatibility

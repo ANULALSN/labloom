@@ -57,7 +57,7 @@ export default function LoginPage() {
             <div className="auth-brand">
                 <div className="auth-brand-content">
                     <div className="auth-brand-logo">
-                        <img src="/logo.jpeg" alt="Labloom" />
+                        <img src="/logo.png" alt="Labloom" />
                     </div>
                     <h2>Labloom Enterprise</h2>
                     <p>Scale your medical services with integrated precision diagnostics.</p>
