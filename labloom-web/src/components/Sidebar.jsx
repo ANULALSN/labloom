@@ -11,22 +11,10 @@ const navConfig = {
             { icon: '', label: 'Platform Reviews', path: '/admin/reviews' },
         ]
     },
-    patient: {
-        label: 'Patient',
-        items: [
-            { icon: '', label: 'Dashboard', path: '/patient' },
-            { icon: '', label: 'Find Doctors', path: '/patient/doctors' },
-            { icon: '', label: 'Find Labs', path: '/patient/labs' },
-            { icon: '', label: 'My Appointments', path: '/patient/appointments' },
-            { icon: '', label: 'My Reports', path: '/patient/reports' },
-            { icon: '', label: 'Chat', path: '/patient/chat' },
-            { icon: '', label: 'My Reviews', path: '/patient/reviews' },
-            { icon: '', label: 'Health Profile', path: '/patient/profile' },
-        ]
-    },
     doctor: {
         label: 'Doctor',
         items: [
+            { icon: '🛡️', label: 'Verification', path: '/doctor/verification' },
             { icon: '', label: 'Appointments', path: '/doctor' },
             { icon: '', label: 'My Patients', path: '/doctor/patients' },
             { icon: '', label: 'Verify Reports', path: '/doctor/verify-reports' },

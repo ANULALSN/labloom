@@ -10,6 +10,7 @@ export default function DoctorDashboard() {
     const [filter, setFilter] = useState('');
     const [loading, setLoading] = useState(true);
     const [selectedPatient, setSelectedPatient] = useState(null);
+    const [profile, setProfile] = useState(null);
     const toast = useToast();
 
     const fetchAppointments = async () => {
@@ -25,7 +26,17 @@ export default function DoctorDashboard() {
         setLoading(false);
     };
 
-    useEffect(() => { fetchAppointments(); }, [filter]);
+    const fetchProfile = async () => {
+        try {
+            const data = await api.get('/api/doctor/availability');
+            setProfile(data);
+        } catch { }
+    };
+
+    useEffect(() => {
+        fetchAppointments();
+        if (!profile) fetchProfile();
+    }, [filter]);
 
     const updateStatus = async (id, status) => {
         try {
@@ -52,6 +63,21 @@ export default function DoctorDashboard() {
                         <h1>Appointments</h1>
                         <p>Your schedule and patient appointments</p>
                     </div>
+
+                    {profile && profile.verificationStatus !== 'approved' && (
+                        <div className="card mb-24" style={{ backgroundColor: 'var(--warning)', color: '#000', border: 'none' }}>
+                            <div className="flex gap-16" style={{ alignItems: 'center' }}>
+                                <div style={{ fontSize: 24 }}>⚠️</div>
+                                <div style={{ flex: 1 }}>
+                                    <h3 style={{ margin: 0, color: '#000' }}>Action Required: Account Verification Pending</h3>
+                                    <p style={{ margin: '4px 0 0 0', opacity: 0.8 }}>Your account is currently {profile.verificationStatus}. Patients cannot see your profile until you are approved.</p>
+                                </div>
+                                <a href="/doctor/verification" className="btn" style={{ backgroundColor: '#000', color: '#fff', border: 'none' }}>
+                                    Upload Documents
+                                </a>
+                            </div>
+                        </div>
+                    )}
 
                     <div className="flex gap-8 mb-24">
                         {['', 'pending', 'confirmed', 'completed', 'cancelled'].map(f => (

@@ -16,6 +16,9 @@ export default function ManageSlots() {
     const [availability, setAvailability] = useState([]);
     const [consultationFee, setConsultationFee] = useState(500);
     const [specialization, setSpecialization] = useState('');
+    const [verificationStatus, setVerificationStatus] = useState('pending');
+    const [verificationDocuments, setVerificationDocuments] = useState([]);
+    const [uploadingDoc, setUploadingDoc] = useState(false);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const toast = useToast();
@@ -30,6 +33,8 @@ export default function ManageSlots() {
             setAvailability(data.availability || []);
             setConsultationFee(data.consultationFee || 500);
             setSpecialization(data.specialization || '');
+            setVerificationStatus(data.verificationStatus || 'pending');
+            setVerificationDocuments(data.verificationDocuments || []);
         } catch (err) {
             toast.error(err.message);
         } finally {
@@ -91,6 +96,26 @@ export default function ManageSlots() {
             toast.error(err.message);
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleDocumentUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('document', file);
+
+        setUploadingDoc(true);
+        try {
+            await api.post('/api/upload/doctor-document', formData);
+            toast.success('Document uploaded successfully!');
+            fetchAvailability(); // Refresh documents and status
+        } catch (err) {
+            toast.error(err.message || 'Error uploading document');
+        } finally {
+            setUploadingDoc(false);
+            e.target.value = null; // reset file input
         }
     };
 

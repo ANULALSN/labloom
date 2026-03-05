@@ -14,17 +14,6 @@ import UserManagement from './admin/UserManagement';
 import PendingApprovals from './admin/PendingApprovals';
 import AdminReviews from './admin/AdminReviews';
 
-// Patient
-import PatientDashboard from './patient/PatientDashboard';
-import FindDoctors from './patient/FindDoctors';
-import FindLabs from './patient/FindLabs';
-import MyAppointments from './patient/MyAppointments';
-import MyReports from './patient/MyReports';
-import Chat from './patient/Chat';
-import MyReviews from './patient/MyReviews';
-import HealthAssessment from './patient/HealthAssessment';
-import PatientProfile from './patient/PatientProfile';
-
 // Doctor
 import DoctorDashboard from './doctor/DoctorDashboard';
 import PatientList from './doctor/PatientList';
@@ -32,6 +21,7 @@ import ManageSlots from './doctor/ManageSlots';
 import DoctorChat from './doctor/DoctorChat';
 import VerifyReports from './doctor/VerifyReports';
 import DoctorReviews from './doctor/DoctorReviews';
+import DoctorVerification from './doctor/DoctorVerification';
 
 // Hospital
 import HospitalDashboard from './hospital/HospitalDashboard';
@@ -46,6 +36,64 @@ import LabDashboard from './lab/LabDashboard';
 import LabReviews from './lab/LabReviews';
 import LabBookings from './lab/LabBookings';
 import LabTests from './lab/LabTests';
+
+// Patient mobile redirect page
+function PatientMobileRedirect() {
+  return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+      fontFamily: "'Inter', sans-serif",
+      padding: 24
+    }}>
+      <div style={{
+        maxWidth: 420,
+        textAlign: 'center',
+        background: 'rgba(255,255,255,0.05)',
+        backdropFilter: 'blur(20px)',
+        borderRadius: 20,
+        padding: '48px 32px',
+        border: '1px solid rgba(255,255,255,0.1)'
+      }}>
+        <div style={{ fontSize: 64, marginBottom: 16 }}>📱</div>
+        <h1 style={{ color: '#fff', fontSize: 24, margin: '0 0 8px 0' }}>Use the Labloom App</h1>
+        <p style={{ color: '#94a3b8', fontSize: 15, lineHeight: 1.6, margin: '0 0 28px 0' }}>
+          The patient portal is available exclusively on our mobile app for the best experience — book doctors, view reports, chat, and more.
+        </p>
+        <div style={{
+          display: 'flex',
+          gap: 12,
+          justifyContent: 'center',
+          flexWrap: 'wrap'
+        }}>
+          <a href="#" style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            background: '#fff', color: '#0f172a', padding: '12px 24px',
+            borderRadius: 12, fontWeight: 600, fontSize: 14,
+            textDecoration: 'none'
+          }}>
+            🍎 App Store
+          </a>
+          <a href="#" style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            background: '#fff', color: '#0f172a', padding: '12px 24px',
+            borderRadius: 12, fontWeight: 600, fontSize: 14,
+            textDecoration: 'none'
+          }}>
+            ▶️ Google Play
+          </a>
+        </div>
+        <p style={{ color: '#64748b', fontSize: 12, marginTop: 28 }}>
+          Are you a doctor, hospital, or lab?{' '}
+          <a href="/login" style={{ color: '#60a5fa' }}>Sign in here</a>
+        </p>
+      </div>
+    </div>
+  );
+}
 
 export default function App() {
   return (
@@ -63,19 +111,13 @@ export default function App() {
             <Route path="/admin/approvals" element={<ProtectedRoute allowedRoles={['admin']}><PendingApprovals /></ProtectedRoute>} />
             <Route path="/admin/reviews" element={<ProtectedRoute allowedRoles={['admin']}><AdminReviews /></ProtectedRoute>} />
 
-            {/* Patient Portal */}
-            <Route path="/patient" element={<ProtectedRoute allowedRoles={['patient']}><PatientDashboard /></ProtectedRoute>} />
-            <Route path="/patient/doctors" element={<ProtectedRoute allowedRoles={['patient']}><FindDoctors /></ProtectedRoute>} />
-            <Route path="/patient/labs" element={<ProtectedRoute allowedRoles={['patient']}><FindLabs /></ProtectedRoute>} />
-            <Route path="/patient/appointments" element={<ProtectedRoute allowedRoles={['patient']}><MyAppointments /></ProtectedRoute>} />
-            <Route path="/patient/reports" element={<ProtectedRoute allowedRoles={['patient']}><MyReports /></ProtectedRoute>} />
-            <Route path="/patient/chat" element={<ProtectedRoute allowedRoles={['patient']}><Chat /></ProtectedRoute>} />
-            <Route path="/patient/reviews" element={<ProtectedRoute allowedRoles={['patient']}><MyReviews /></ProtectedRoute>} />
-            <Route path="/patient/assessment" element={<ProtectedRoute allowedRoles={['patient']}><HealthAssessment /></ProtectedRoute>} />
-            <Route path="/patient/profile" element={<ProtectedRoute allowedRoles={['patient']}><PatientProfile /></ProtectedRoute>} />
+            {/* Patient — redirect to mobile app download page */}
+            <Route path="/patient" element={<PatientMobileRedirect />} />
+            <Route path="/patient/*" element={<PatientMobileRedirect />} />
 
             {/* Doctor Portal */}
             <Route path="/doctor" element={<ProtectedRoute allowedRoles={['doctor']}><DoctorDashboard /></ProtectedRoute>} />
+            <Route path="/doctor/verification" element={<ProtectedRoute allowedRoles={['doctor']}><DoctorVerification /></ProtectedRoute>} />
             <Route path="/doctor/patients" element={<ProtectedRoute allowedRoles={['doctor']}><PatientList /></ProtectedRoute>} />
             <Route path="/doctor/slots" element={<ProtectedRoute allowedRoles={['doctor']}><ManageSlots /></ProtectedRoute>} />
             <Route path="/doctor/chat" element={<ProtectedRoute allowedRoles={['doctor']}><DoctorChat /></ProtectedRoute>} />

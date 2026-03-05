@@ -40,6 +40,17 @@ export default function UserManagement() {
         }
     };
 
+    const deleteUser = async (userId) => {
+        if (!window.confirm("Are you sure you want to permanently delete this user? This action cannot be undone.")) return;
+        try {
+            await api.delete(`/api/admin/users/${userId}`);
+            toast.success('User deleted successfully');
+            fetchUsers();
+        } catch (err) {
+            toast.error(err.message || 'Failed to delete user');
+        }
+    };
+
     const getRoleBadge = (role) => {
         const map = { patient: 'badge-info', doctor: 'badge-primary', hospital: 'badge-success', lab: 'badge-warning', admin: 'badge-danger' };
         return <span className={`badge ${map[role] || 'badge-info'}`}>{role}</span>;
@@ -106,12 +117,24 @@ export default function UserManagement() {
                                                 </span>
                                             </td>
                                             <td>
-                                                <button
-                                                    className={`btn btn-sm ${u.isActive !== false ? 'btn-danger' : 'btn-success'}`}
-                                                    onClick={() => toggleStatus(u._id, u.isActive !== false)}
-                                                >
-                                                    {u.isActive !== false ? 'Suspend' : 'Activate'}
-                                                </button>
+                                                <div className="flex gap-8">
+                                                    <button
+                                                        className={`btn btn-sm ${u.isActive !== false ? 'btn-warning' : 'btn-success'}`}
+                                                        style={{ minWidth: 80 }}
+                                                        onClick={() => toggleStatus(u._id, u.isActive !== false)}
+                                                    >
+                                                        {u.isActive !== false ? 'Suspend' : 'Activate'}
+                                                    </button>
+
+                                                    {u.role !== 'admin' && (
+                                                        <button
+                                                            className="btn btn-sm btn-danger"
+                                                            onClick={() => deleteUser(u._id)}
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}
