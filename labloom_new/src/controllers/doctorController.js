@@ -8,10 +8,11 @@ const User = require('../models/User');
 // @access  Public
 const getDoctors = async (req, res) => {
     try {
-        // ONLY Registered users with role='doctor' who are approved (privacyPolicyAccepted = true)
+        // ONLY show doctors whose verification has been explicitly approved by admin
         const userDoctors = await User.find({
             role: 'doctor',
-            privacyPolicyAccepted: true
+            'doctorProfile.verificationStatus': 'approved',
+            isActive: { $ne: false }
         }).select('name phone email doctorProfile createdAt');
 
         // Normalize user-doctors to match Doctor model shape

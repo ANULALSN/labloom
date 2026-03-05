@@ -93,20 +93,7 @@ const signup = async (req, res) => {
             user.entityModel = 'Lab';
             await user.save();
         }
-        // For restricted roles (doctor, lab, hospital), don't return tokens immediately, require approval
-        const restrictedRoles = ['doctor', 'lab', 'hospital'];
-        if (restrictedRoles.includes(user.role)) {
-            return res.status(201).json({
-                _id: user.id,
-                name: user.name,
-                email: user.email,
-                phone: user.phone,
-                role: user.role,
-                message: 'Registration successful. Your account is pending admin approval.'
-            });
-        }
-
-        // Generate tokens for patients
+        // Generate tokens for all roles (including doctors/labs/hospitals)
         const accessToken = generateAccessToken(user.id, user.role);
         const refreshToken = generateRefreshToken();
 
@@ -124,7 +111,8 @@ const signup = async (req, res) => {
             phone: user.phone,
             role: user.role,
             accessToken,
-            refreshToken
+            refreshToken,
+            message: 'Registration successful. Please upload your verification documents in the dashboard.'
         });
     } else {
         res.status(400).json({ message: 'Invalid user data' });
@@ -147,13 +135,9 @@ const requestOtp = async (req, res) => {
         });
     }
 
-    // BLOCK DOCTORS, LABS, HOSPITALS WHO ARE NOT APPROVED
-    const restrictedRoles = ['doctor', 'lab', 'hospital'];
-    if (restrictedRoles.includes(user.role) && !user.privacyPolicyAccepted) {
-        return res.status(403).json({
-            message: 'Your account is pending admin approval. You cannot log in yet.'
-        });
-    }
+    // Removed approval block to allow login for document upload
+    // const restrictedRoles = ['doctor', 'lab', 'hospital'];
+    // if (restrictedRoles.includes(user.role) && !user.privacyPolicyAccepted) { ... }
 
     // Use fixed 4-digit OTP for testing
     const otp = '1234';
@@ -180,11 +164,9 @@ const verifyOtp = async (req, res) => {
     const user = await User.findOne({ phone });
 
     if (user && user.otp === otp && user.otpExpires > Date.now()) {
-        // Final safety check: Check if approved
-        const restrictedRoles = ['doctor', 'lab', 'hospital'];
-        if (restrictedRoles.includes(user.role) && !user.privacyPolicyAccepted) {
-            return res.status(403).json({ message: 'Your account is pending approval. Please contact administrator.' });
-        }
+        // Removed approval check to allow login for document upload
+        // const restrictedRoles = ['doctor', 'lab', 'hospital'];
+        // if (restrictedRoles.includes(user.role) && !user.privacyPolicyAccepted) { ... }
 
         // Clear OTP after successful login
         user.otp = undefined;

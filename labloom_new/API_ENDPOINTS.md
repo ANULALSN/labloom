@@ -33,6 +33,8 @@ GET    /api/patients/doctors?query={q}&specialization={spec}
 GET    /api/patients/labs?city={city}
 GET    /api/patients/reports
 GET    /api/patients/prescriptions
+POST   /api/patients/feedback
+GET    /api/patients/reviews?targetId={id}&targetType={type}
 ```
 
 ---

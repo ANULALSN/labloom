@@ -99,6 +99,10 @@ const userSchema = mongoose.Schema({
         enum: ['patient', 'doctor', 'lab', 'hospital', 'admin'],
         default: 'patient'
     },
+    isActive: {
+        type: Boolean,
+        default: true
+    },
     // Doctor-specific fields (only populated if role === 'doctor')
     doctorProfile: {
         specialization: { type: String },
@@ -129,7 +133,12 @@ const userSchema = mongoose.Schema({
             type: String,
             enum: ['pending', 'approved', 'rejected'],
             default: 'pending'
-        }
+        },
+        verificationDocuments: [{
+            name: { type: String },
+            url: { type: String },
+            uploadedAt: { type: Date, default: Date.now }
+        }]
     },
     // Lab/Hospital reference (if role === 'lab' or 'hospital')
     entityReference: {

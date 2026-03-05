@@ -94,10 +94,12 @@ const bookingSchema = mongoose.Schema({
     },
     labReport: {
         reportUrl: { type: String },
-        status: { type: String, default: 'Pending' }, // e.g. "Normal Results", "Requires Attention"
+        status: { type: String, default: 'Pending' },
         resultDate: { type: Date },
         verifiedByDoctor: { type: Boolean, default: false },
-        verifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+        verifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        // Doctor who should review this report — auto-set from patient's last doctor appointment
+        referringDoctor: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
     }
 }, {
     timestamps: true

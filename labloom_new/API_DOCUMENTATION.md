@@ -110,6 +110,27 @@ Historical tracking for vital signs.
 
 ---
 
+## ⭐ Reviews & Feedback
+Endpoints for patients to rate and review medical entities.
+
+### 1. Submit Feedback
+`POST /api/patients/feedback`
+*   **Body:** 
+    ```json
+    {
+      "targetId": "65ab...",
+      "targetType": "doctor",
+      "targetName": "Dr. Smith",
+      "rating": 5,
+      "comment": "Very satisfied!"
+    }
+    ```
+
+### 2. View Reviews
+`GET /api/patients/reviews?targetId=...&targetType=doctor`
+
+---
+
 ## ⚙️ Settings & Utility
 *   **Favorite Doctors:** `GET /api/users/favorites`
 *   **Notifications:** `GET /api/notifications`

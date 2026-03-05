@@ -11,6 +11,7 @@ const {
     approveDoctor,
     getAllUsers,
     updateUserStatus,
+    deleteUser,
     getSystemAnalytics
 } = require('../controllers/adminPortalController');
 const { protect, admin } = require('../middleware/authMiddleware');
@@ -196,6 +197,23 @@ router.get('/users', protect, admin, getAllUsers);
  *       200: { description: Status updated }
  */
 router.patch('/users/:id/status', protect, admin, updateUserStatus);
+
+/**
+ * @swagger
+ * /api/admin/users/{id}:
+ *   delete:
+ *     summary: Permanently delete a user/doctor/lab account
+ *     tags: [Admin Portal]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: Account deleted }
+ */
+router.delete('/users/:id', protect, admin, deleteUser);
 
 /**
  * @swagger

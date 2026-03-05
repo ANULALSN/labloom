@@ -384,6 +384,32 @@ const findLabs = async (city) => {
 };
 ```
 
+### Reviews & Feedback
+
+**Submit Review:** `POST /api/patients/feedback`
+
+```javascript
+const submitReview = async (reviewData) => {
+  const response = await api.post('/api/patients/feedback', {
+    targetId: reviewData.targetId,
+    targetType: reviewData.targetType, // 'doctor', 'lab', 'hospital'
+    targetName: reviewData.targetName,
+    rating: reviewData.rating,
+    comment: reviewData.comment,
+  });
+  return response.data;
+};
+```
+
+**Get Reviews:** `GET /api/patients/reviews?targetId={id}&targetType={type}`
+
+```javascript
+const getEntityReviews = async (targetId, targetType) => {
+  const response = await api.get(`/api/patients/reviews?targetId=${targetId}&targetType=${targetType}`);
+  return response.data;
+};
+```
+
 ---
 
 ## 👨‍⚕️ Doctor Portal

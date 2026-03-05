@@ -4,6 +4,7 @@ const Test = require('../models/Test');
 const User = require('../models/User');
 const path = require('path');
 const fs = require('fs');
+const sendEmail = require('../utils/mailer');
 
 // @desc    Get lab bookings
 // @route   GET /api/lab/bookings
@@ -159,12 +160,15 @@ const updateLabStatus = async (req, res) => {
     }
 };
 
-// @desc    Upload test report for a specific booking
+// @desc    Upload test report for a specific booking (using Cloudinary)
 // @route   POST /api/lab/bookings/:id/upload-report
 // @access  Private (Lab staff)
 const uploadBookingReport = async (req, res) => {
     try {
-        const booking = await Booking.findById(req.params.id);
+        const booking = await Booking.findById(req.params.id)
+            .populate('user', 'name email phone')
+            .populate('test', 'name')
+            .populate('lab', 'name');
 
         if (!booking) {
             return res.status(404).json({ message: 'Booking not found' });
@@ -178,17 +182,48 @@ const uploadBookingReport = async (req, res) => {
             return res.status(400).json({ message: 'No file uploaded' });
         }
 
-        const reportUrl = `/uploads/reports/${req.file.filename}`;
+        // req.file.path is the Cloudinary URL when using multer-storage-cloudinary
+        const reportUrl = req.file.path;
 
         booking.labReport = {
             reportUrl,
-            resultDate: Date.now(),
-            status: 'Normal Results'
+            resultDate: new Date(),
+            status: 'Pending Verification',
+            verifiedByDoctor: false
         };
+
+        // Auto-detect the referring doctor: find the patient's most recent completed doctor appointment
+        try {
+            const lastDoctorAppt = await Booking.findOne({
+                user: booking.user._id || booking.user,
+                bookingType: 'doctor',
+                status: 'completed',
+                doctor: { $exists: true }
+            }).sort({ date: -1 }).select('doctor');
+
+            if (lastDoctorAppt?.doctor) {
+                booking.labReport.referringDoctor = lastDoctorAppt.doctor;
+            }
+        } catch (refErr) {
+            console.error('Could not auto-detect referring doctor:', refErr.message);
+        }
 
         await booking.save();
 
-        res.json({ message: 'Report uploaded successfully', reportUrl, booking });
+        // Send email notification to patient that report is uploaded and pending doctor review
+        if (booking.user?.email) {
+            try {
+                await sendEmail({
+                    email: booking.user.email,
+                    subject: `Your ${booking.test?.name || 'Lab Test'} Report — Under Review`,
+                    message: `Dear ${booking.user.name},\n\nYour test report from ${booking.lab?.name || 'our lab'} has been uploaded and is currently being reviewed by a doctor.\n\nYou will receive another notification once the report is verified and released to you.\n\nThank you for choosing Labloom.`
+                });
+            } catch (mailErr) {
+                console.error('Email notification error:', mailErr.message);
+            }
+        }
+
+        res.json({ message: 'Report uploaded successfully. Awaiting doctor verification.', reportUrl, booking });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -432,6 +467,24 @@ const addLabStaff = async (req, res) => {
     }
 };
 
+// @desc    Get lab settings
+// @route   GET /api/lab/settings
+// @access  Private (Lab admin)
+const getLabSettings = async (req, res) => {
+    try {
+        const labId = req.user.entityReference;
+        const lab = await Lab.findById(labId);
+
+        if (!lab) {
+            return res.status(404).json({ message: 'Lab not found' });
+        }
+
+        res.json(lab);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 // @desc    Update lab settings
 // @route   PATCH /api/lab/settings
 // @access  Private (Lab admin)
@@ -439,6 +492,11 @@ const updateLabSettings = async (req, res) => {
     try {
         const labId = req.user.entityReference;
         const updates = req.body;
+
+        // Prevent someone from manually changing their verification status
+        if (updates.verificationStatus) {
+            delete updates.verificationStatus;
+        }
 
         const lab = await Lab.findByIdAndUpdate(labId, updates, { new: true });
 
@@ -457,7 +515,10 @@ const updateLabSettings = async (req, res) => {
 // @access  Private (Lab staff)
 const sendEmailReport = async (req, res) => {
     try {
-        const booking = await Booking.findById(req.params.id).populate('user', 'name email').populate('test', 'name').populate('lab', 'name');
+        const booking = await Booking.findById(req.params.id)
+            .populate('user', 'name email')
+            .populate('test', 'name')
+            .populate('lab', 'name');
 
         if (!booking) {
             return res.status(404).json({ message: 'Booking not found' });
@@ -471,14 +532,11 @@ const sendEmailReport = async (req, res) => {
             return res.status(400).json({ message: 'Patient does not have an email address' });
         }
 
-        // Simulating email sending logic
-        console.log(`--------------------------------------------------`);
-        console.log(`EMAIL SIMULATION:`);
-        console.log(`To: ${booking.user.email} (${booking.user.name})`);
-        console.log(`Subject: Your Test Report from ${booking.lab.name}`);
-        console.log(`Body: Hello ${booking.user.name}, your report for ${booking.test.name} is ready.`);
-        console.log(`Attachment: http://localhost:5000${booking.labReport.reportUrl}`);
-        console.log(`--------------------------------------------------`);
+        await sendEmail({
+            email: booking.user.email,
+            subject: `Your ${booking.test?.name || 'Lab Test'} Report from ${booking.lab?.name || 'Labloom'}`,
+            message: `Dear ${booking.user.name},\n\nYour test report from ${booking.lab?.name || 'Labloom'} is ready.\n\nYou can view and download your report here:\n${booking.labReport.reportUrl}\n\nThank you for choosing Labloom.`
+        });
 
         res.json({ message: `Report sent to ${booking.user.email}` });
     } catch (error) {
@@ -501,6 +559,7 @@ module.exports = {
     removeFromCatalog,
     getLabStaff,
     addLabStaff,
+    getLabSettings,
     updateLabSettings,
     sendEmailReport
 };

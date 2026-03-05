@@ -313,12 +313,52 @@ const updateUserStatus = async (req, res) => {
 
         if (!user) return res.status(404).json({ message: 'User not found' });
 
-        // In User model, we should add isActive field if not present
-        // For now, let's assume we use 'suspended' role or a separate field
         user.isActive = isActive;
+
+        // Also update doctorProfile / lab status if applicable to suspend them from listings
+        if (user.role === 'doctor' && user.doctorProfile) {
+            user.doctorProfile.verificationStatus = isActive ? 'approved' : 'suspended';
+        } else if ((user.role === 'lab' || user.role === 'hospital') && user.entityReference) {
+            let Model = user.role === 'lab' ? Lab : Hospital;
+            await Model.findByIdAndUpdate(user.entityReference, {
+                verificationStatus: isActive ? 'approved' : 'suspended',
+                isActive: isActive
+            });
+        }
+
         await user.save();
 
         res.json({ message: `User status updated to ${isActive ? 'Active' : 'Suspended'}` });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Delete user
+// @route   DELETE /api/admin/users/:id
+// @access  Private (Admin)
+const deleteUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        if (user.role === 'admin') {
+            return res.status(403).json({ message: 'Cannot delete admin accounts' });
+        }
+
+        // Delete associated entity if it's a lab or hospital
+        if ((user.role === 'lab' || user.role === 'hospital') && user.entityReference) {
+            let Model = user.role === 'lab' ? Lab : Hospital;
+            await Model.findByIdAndDelete(user.entityReference);
+        }
+
+        // We can optionally delete bookings and reviews associated with this user,
+        // but it's often better to keep them for historical records.
+
+        await User.findByIdAndDelete(req.params.id);
+
+        res.json({ message: 'User and associated data permanently deleted' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -367,5 +407,6 @@ module.exports = {
     approveDoctor,
     getAllUsers,
     updateUserStatus,
+    deleteUser,
     getSystemAnalytics
 };

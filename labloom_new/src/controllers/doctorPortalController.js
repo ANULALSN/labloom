@@ -1,6 +1,7 @@
 const Booking = require('../models/Booking');
 const Consultation = require('../models/Consultation');
 const User = require('../models/User');
+const sendEmail = require('../utils/mailer');
 
 // @desc    Get doctor's appointments
 // @route   GET /api/doctor/appointments
@@ -307,7 +308,7 @@ const issuePrescription = async (req, res) => {
 // @access  Private (Doctor only)
 const getDoctorAvailability = async (req, res) => {
     try {
-        const doctor = await User.findById(req.user.id).select('doctorProfile.availability doctorProfile.consultationFee doctorProfile.specialization name');
+        const doctor = await User.findById(req.user.id).select('doctorProfile.availability doctorProfile.consultationFee doctorProfile.specialization name doctorProfile.verificationStatus doctorProfile.verificationDocuments');
         if (!doctor) {
             return res.status(404).json({ message: 'Doctor not found' });
         }
@@ -315,7 +316,9 @@ const getDoctorAvailability = async (req, res) => {
             availability: doctor.doctorProfile?.availability || [],
             consultationFee: doctor.doctorProfile?.consultationFee || 500,
             specialization: doctor.doctorProfile?.specialization || '',
-            name: doctor.name
+            name: doctor.name,
+            verificationStatus: doctor.doctorProfile?.verificationStatus,
+            verificationDocuments: doctor.doctorProfile?.verificationDocuments || []
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -352,33 +355,64 @@ const updateDoctorAvailability = async (req, res) => {
     }
 };
 
-// @desc    Get reports pending doctor verification
+// @desc    Get reports pending doctor verification (only for this doctor's patients)
 // @route   GET /api/doctor/pending-reports
 // @access  Private (Doctor only)
 const getPendingReports = async (req, res) => {
     try {
-        const reports = await Booking.find({
+        // Primary: reports explicitly assigned to this doctor via referringDoctor
+        const assignedReports = await Booking.find({
             bookingType: 'test',
-            'labReport.reportUrl': { $exists: true },
-            'labReport.verifiedByDoctor': false
+            'labReport.reportUrl': { $exists: true, $ne: null },
+            'labReport.verifiedByDoctor': false,
+            'labReport.referringDoctor': req.user.id
         })
             .populate('user', 'name phone email')
             .populate('test', 'name category')
             .populate('lab', 'name')
             .sort({ updatedAt: -1 });
 
-        res.json(reports);
+        // Fallback: reports for patients this doctor has previously treated
+        // (handles legacy reports uploaded before referringDoctor was tracked)
+        const myPatientIds = await Booking.find({
+            doctor: req.user.id,
+            bookingType: 'doctor'
+        }).distinct('user');
+
+        const patientReports = await Booking.find({
+            bookingType: 'test',
+            'labReport.reportUrl': { $exists: true, $ne: null },
+            'labReport.verifiedByDoctor': false,
+            'labReport.referringDoctor': { $exists: false }, // no doctor assigned yet
+            user: { $in: myPatientIds }
+        })
+            .populate('user', 'name phone email')
+            .populate('test', 'name category')
+            .populate('lab', 'name')
+            .sort({ updatedAt: -1 });
+
+        // Merge — assigned reports first, then fallback patient reports
+        const allReports = [
+            ...assignedReports,
+            ...patientReports.filter(r => !assignedReports.find(a => a._id.equals(r._id)))
+        ];
+
+        res.json(allReports);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-// @desc    Verify lab report
+
+// @desc    Verify lab report and notify patient
 // @route   POST /api/doctor/verify-report/:id
 // @access  Private (Doctor only)
 const verifyReport = async (req, res) => {
     try {
-        const booking = await Booking.findById(req.params.id);
+        const booking = await Booking.findById(req.params.id)
+            .populate('user', 'name email')
+            .populate('test', 'name')
+            .populate('lab', 'name');
 
         if (!booking || !booking.labReport) {
             return res.status(404).json({ message: 'Report not found' });
@@ -390,7 +424,20 @@ const verifyReport = async (req, res) => {
 
         await booking.save();
 
-        res.json({ message: 'Report verified successfully', booking });
+        // Notify patient that their report is ready
+        if (booking.user?.email) {
+            try {
+                await sendEmail({
+                    email: booking.user.email,
+                    subject: `Your ${booking.test?.name || 'Lab Test'} Report is Ready`,
+                    message: `Dear ${booking.user.name},\n\nGreat news! Your lab test report has been reviewed and verified by a doctor.\n\nYou can view and download your report here:\n${booking.labReport.reportUrl}\n\nTest: ${booking.test?.name || 'Lab Test'}\nLab: ${booking.lab?.name || 'Labloom Partner Lab'}\n\nLog in to your Labloom account to view it anytime.\n\nThank you for choosing Labloom.`
+                });
+            } catch (mailErr) {
+                console.error('Patient notification email error:', mailErr.message);
+            }
+        }
+
+        res.json({ message: 'Report verified and patient notified successfully.', booking });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

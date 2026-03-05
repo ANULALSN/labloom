@@ -49,6 +49,7 @@ app.use('/api/utils', require('./routes/utilRoutes'));
 app.use('/api/chat', require('./routes/chatRoutes'));
 app.use('/api/feedback', require('./routes/feedbackRoutes'));
 app.use('/api/hospitals', require('./routes/hospitalPortalRoutes'));
+app.use('/api/upload', require('./routes/uploadRoutes'));
 
 app.get('/', (req, res) => {
     res.send('API is running...');

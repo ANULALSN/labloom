@@ -34,6 +34,8 @@
 | GET | `/labs?city={city}` | ❌ | Find labs |
 | GET | `/reports` | ✅ | Get lab reports |
 | GET | `/prescriptions` | ✅ | Get prescriptions |
+| POST | `/feedback` | ✅ | Submit feedback/review |
+| GET | `/reviews?targetId={id}&targetType={type}` | ❌ | Get reviews for entity |
 
 ---
 
@@ -182,6 +184,17 @@
       "instructions": "Take after meals"
     }
   ]
+}
+```
+
+### Submit Review
+```json
+{
+  "targetId": "65ab123...",
+  "targetType": "doctor",
+  "targetName": "Dr. Smith",
+  "rating": 5,
+  "comment": "Very professional and helpful."
 }
 ```
 

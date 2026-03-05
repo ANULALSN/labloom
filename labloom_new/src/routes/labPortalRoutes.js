@@ -17,31 +17,13 @@ const {
     removeFromCatalog,
     getLabStaff,
     addLabStaff,
+    getLabSettings,
     updateLabSettings,
     sendEmailReport
 } = require('../controllers/labPortalController');
 const { protect, verifyLab, authorizeRoles } = require('../middleware/authMiddleware');
+const { upload } = require('../config/cloudinary'); // Use Cloudinary for report uploads
 
-// Multer setup for report uploads (PDF)
-const reportStorage = multer.diskStorage({
-    destination: './uploads/reports/',
-    filename: function (req, file, cb) {
-        cb(null, 'report-' + Date.now() + path.extname(file.originalname));
-    }
-});
-const reportUpload = multer({
-    storage: reportStorage,
-    limits: { fileSize: 20000000 }, // 20MB
-    fileFilter: function (req, file, cb) {
-        const filetypes = /pdf|jpg|jpeg|png/;
-        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-        const mimetype = filetypes.test(file.mimetype);
-        if (mimetype && extname) {
-            return cb(null, true);
-        }
-        cb('Error: PDF and image files only!');
-    }
-});
 
 router.use(protect);
 router.use(authorizeRoles('lab', 'admin'));
@@ -150,7 +132,7 @@ router.patch('/bookings/:id/status', updateLabStatus);
  *     responses:
  *       200: { description: Report uploaded }
  */
-router.post('/bookings/:id/upload-report', reportUpload.single('report'), uploadBookingReport);
+router.post('/bookings/:id/upload-report', upload.single('report'), uploadBookingReport);
 router.post('/bookings/:id/send-email', sendEmailReport);
 
 /**
@@ -310,6 +292,18 @@ router.get('/staff', getLabStaff);
  *       201: { description: Staff registered }
  */
 router.post('/staff', addLabStaff);
+
+/**
+ * @swagger
+ * /api/lab/settings:
+ *   get:
+ *     summary: Get lab configuration
+ *     tags: [Lab Portal]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200: { description: Lab settings }
+ */
+router.get('/settings', getLabSettings);
 
 /**
  * @swagger

@@ -61,14 +61,7 @@ const authorizeRoles = (...roles) => {
 // Specific role middleware
 const verifyDoctor = (req, res, next) => {
     if (req.user && req.user.role === 'doctor') {
-        // Accept either doctorProfile.verificationStatus or privacyPolicyAccepted as approval
-        const profileApproved = req.user.doctorProfile && req.user.doctorProfile.verificationStatus === 'approved';
-        const policyApproved = req.user.privacyPolicyAccepted === true;
-        if (profileApproved || policyApproved) {
-            next();
-        } else {
-            res.status(403).json({ message: 'Access denied. Doctor account pending approval.' });
-        }
+        next();
     } else {
         res.status(403).json({ message: 'Access denied. Doctor only.' });
     }
@@ -76,11 +69,7 @@ const verifyDoctor = (req, res, next) => {
 
 const verifyLab = (req, res, next) => {
     if (req.user && req.user.role === 'lab') {
-        if (req.user.privacyPolicyAccepted) {
-            next();
-        } else {
-            res.status(403).json({ message: 'Access denied. Lab account pending approval.' });
-        }
+        next();
     } else {
         res.status(403).json({ message: 'Access denied. Lab only.' });
     }
@@ -88,11 +77,7 @@ const verifyLab = (req, res, next) => {
 
 const verifyHospital = (req, res, next) => {
     if (req.user && req.user.role === 'hospital') {
-        if (req.user.privacyPolicyAccepted) {
-            next();
-        } else {
-            res.status(403).json({ message: 'Access denied. Hospital account pending approval.' });
-        }
+        next();
     } else {
         res.status(403).json({ message: 'Access denied. Hospital only.' });
     }
