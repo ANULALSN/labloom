@@ -157,8 +157,14 @@ Ensure you have the following installed:
    CLOUDINARY_API_KEY=your_api_key
    CLOUDINARY_API_SECRET=your_api_secret
    SMTP_EMAIL=your_email@gmail.com
-   SMTP_PASSWORD=your_google_app_password
+   SMTP_PASSWORD=abcd efgh ijkl mnop  # MUST be a 16-character Google App Password
    ```
+   > [!IMPORTANT]
+   > For Gmail, you **cannot** use your regular password. You must:
+   > 1. Enable **2-Step Verification** on your Google account.
+   > 2. Search for **"App Passwords"** in your Google account settings.
+   > 3. Generate a new password (16 characters) and use it here.
+
 4. Start the development server:
    ```bash
    npm run dev
