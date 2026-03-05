@@ -43,37 +43,33 @@ Labloom/
 
 ---
 
+## 📜 Documentation
+
+For a comprehensive guide on the platform's architecture, functionalities, and module-wise working, please refer to the following:
+
+- **📄 [Full Project Documentation](./PROJECT_DOCUMENTATION.md)**: End-to-end functionalities, tech stack, and module details.
+- **📱 [Patient Mobile API Guide](./labloom_new/PATIENT_MOBILE_API.md)**: Flutter integration guide for mobile app developers.
+
+---
+
 ## 🚀 Getting Started
 
-### 1. Prerequisites
-- Node.js (v16+)
-- MongoDB (Local or Atlas)
+To set up the Labloom ecosystem on your local machine, please follow the detailed instructions in the **[Installation Guide](./PROJECT_DOCUMENTATION.md#🚀-getting-started--installation)**.
 
-### 2. Backend Setup
-```bash
-cd labloom_new
-npm install
-# Create a .env file based on the instructions in the labloom_new directory
-npm run dev
-```
-
-### 3. Frontend Setup
-```bash
-cd labloom-web
-npm install
-# Create a .env.local file with VITE_API_URL=http://localhost:5000
-npm run dev
-```
+### Quick Commands:
+- **Backend Setup**: `cd labloom_new && npm install && npm run dev`
+- **Web Frontend Setup**: `cd labloom-web && npm install && npm run dev`
 
 ---
 
-## 📋 Deployment Note
+## 📋 Deployment & Links
+
 - **Live Backend API**: [https://labloom.onrender.com](https://labloom.onrender.com)
-- **Interactive Documentation**: [https://labloom.onrender.com/docs/swagger](https://labloom.onrender.com/docs/swagger)
+- **Interactive API Docs (Swagger)**: [https://labloom-new.onrender.com/docs/swagger](https://labloom-new.onrender.com/docs/swagger)
 
-This project is ready for deployment on platforms like **Render** (Backend) and **Vercel/Netlify** (Frontend).
-- Ensure the `VITE_API_URL` environment variable is set in your frontend hosting to the live backend URL.
-- Ensure `MONGO_URI` and `JWT_SECRET` are set in your backend hosting.
+This project is optimized for deployment on **Render** (Backend) and **Vercel/Netlify** (Frontend).
+Ensure all **Environment Variables** (MongoDB, JWT, Cloudinary, SMTP) are configured in your hosting provider's dashboard.
 
 ---
+
 © 2026 Labloom Healthcare Team.
