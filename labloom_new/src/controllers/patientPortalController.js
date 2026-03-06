@@ -423,12 +423,38 @@ const updateHealthProfile = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // 1. Personal Data
+        // Early return: if already onboarded, just return the existing profile.
+        // This prevents duplicate-field errors when existing users re-submit or re-login.
+        if (user.isHealthProfileComplete) {
+            return res.json({
+                message: 'Profile already complete',
+                user: {
+                    _id: user._id,
+                    name: user.name,
+                    role: user.role,
+                    phone: user.phone,
+                    email: user.email,
+                    isHealthProfileComplete: true,
+                    personalData: {
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        dob: user.dob,
+                        city: user.city,
+                        address: user.address
+                    },
+                    emergencyContact: user.emergencyContact,
+                    healthProfile: user.healthProfile,
+                    lifestyle: user.lifestyle
+                }
+            });
+        }
+
+        // 1. Personal Data — never touch phone (it's the login credential with unique index)
         if (personalData) {
             user.firstName = personalData.firstName || user.firstName;
             user.lastName = personalData.lastName || user.lastName;
             user.dob = personalData.dob || user.dob;
-            user.phone = personalData.phone || user.phone;
+            // phone is intentionally excluded — already set at registration and unique-indexed
             user.email = personalData.email || user.email;
             user.city = personalData.city || user.city;
             user.address = personalData.address || user.address;
