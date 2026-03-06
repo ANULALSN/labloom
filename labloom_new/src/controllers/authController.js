@@ -78,7 +78,10 @@ const loginUser = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (user && (await bcrypt.compare(password, user.password))) {
-        // removed approval block - doctors need to login to upload docs
+        const restrictedRoles = ['doctor', 'lab', 'hospital'];
+        if (restrictedRoles.includes(user.role) && !user.privacyPolicyAccepted) {
+            return res.status(401).json({ message: 'Your account is pending admin approval' });
+        }
 
         res.json({
             _id: user.id,
@@ -110,7 +113,11 @@ const sendOtp = async (req, res) => {
         });
     }
 
-    // removed approval block here too
+    // Check admin approval for restricted roles
+    const restrictedRoles = ['doctor', 'lab', 'hospital'];
+    if (restrictedRoles.includes(user.role) && !user.privacyPolicyAccepted) {
+        return res.status(401).json({ message: 'Your account is pending admin approval' });
+    }
 
     // Use fixed 4-digit OTP for testing
     const otp = '1234';
@@ -136,7 +143,10 @@ const loginWithOtp = async (req, res) => {
     const user = await User.findOne({ phone });
 
     if (user && user.otp === otp && user.otpExpires > Date.now()) {
-        // removed approval block here too
+        const restrictedRoles = ['doctor', 'lab', 'hospital'];
+        if (restrictedRoles.includes(user.role) && !user.privacyPolicyAccepted) {
+            return res.status(401).json({ message: 'Your account is pending admin approval' });
+        }
 
         // Clear OTP after successful login
         user.otp = undefined;

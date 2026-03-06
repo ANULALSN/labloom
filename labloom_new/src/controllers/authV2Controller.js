@@ -145,9 +145,10 @@ const requestOtp = async (req, res) => {
         });
     }
 
-    // Removed approval block to allow login for document upload
-    // const restrictedRoles = ['doctor', 'lab', 'hospital'];
-    // if (restrictedRoles.includes(user.role) && !user.privacyPolicyAccepted) { ... }
+    const restrictedRoles = ['doctor', 'lab', 'hospital'];
+    if (restrictedRoles.includes(user.role) && !user.privacyPolicyAccepted) {
+        return res.status(401).json({ message: 'Your account is pending admin approval' });
+    }
 
     // Use fixed 4-digit OTP for testing
     const otp = '1234';
@@ -183,9 +184,10 @@ const verifyOtp = async (req, res) => {
     const isNotExpired = user.otpExpires > Date.now();
 
     if (isMatch && isNotExpired) {
-        // Removed approval check to allow login for document upload
-        // const restrictedRoles = ['doctor', 'lab', 'hospital'];
-        // if (restrictedRoles.includes(user.role) && !user.privacyPolicyAccepted) { ... }
+        const restrictedRoles = ['doctor', 'lab', 'hospital'];
+        if (restrictedRoles.includes(user.role) && !user.privacyPolicyAccepted) {
+            return res.status(401).json({ message: 'Your account is pending admin approval' });
+        }
 
         // Clear OTP after successful login
         user.otp = undefined;
