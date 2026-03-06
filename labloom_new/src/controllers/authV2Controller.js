@@ -22,100 +22,110 @@ const generateRefreshToken = () => {
 // @route   POST /api/auth/signup
 // @access  Public
 const signup = async (req, res) => {
-    if (!req.body) {
-        return res.status(400).json({ message: 'Request body is missing' });
-    }
-    const { name, email, password, phone, role, privacyPolicyAccepted } = req.body;
-
-    if (!name || !phone) {
-        return res.status(400).json({ message: 'Please add name and phone number' });
-    }
-
-    // Validate role
-    const validRoles = ['patient', 'doctor', 'lab', 'hospital'];
-    const userRole = validRoles.includes(role) ? role : 'patient';
-
-    // Check if user exists
-    const userExists = await User.findOne({
-        $or: [
-            { phone },
-            ...(email ? [{ email }] : [])
-        ]
-    });
-
-    if (userExists) {
-        return res.status(400).json({ message: 'User already exists' });
-    }
-
-    // Hash password if provided
-    let hashedPassword;
-    if (password) {
-        const salt = await bcrypt.genSalt(10);
-        hashedPassword = await bcrypt.hash(password, salt);
-    }
-
-    // Create user
-    // For doctor, lab, hospital: privacyPolicyAccepted defaults to false and is set to true ONLY by admin approval
-    const isPublicUser = ['patient'].includes(userRole);
-
-    const user = await User.create({
-        name,
-        email,
-        password: hashedPassword,
-        phone,
-        role: userRole,
-        privacyPolicyAccepted: isPublicUser ? Boolean(privacyPolicyAccepted) : false,
-        privacyPolicyAcceptedAt: (isPublicUser && privacyPolicyAccepted) ? Date.now() : undefined,
-        doctorProfile: userRole === 'doctor' ? { specialization: req.body.specialisation || 'General Physician' } : undefined
-    });
-
-    if (user) {
-        if (user.role === 'hospital') {
-            const hospital = await Hospital.create({
-                name: user.name,
-                registrationNumber: `REG_PENDING_${user.phone}`,
-                email: user.email || `hospital_${user.id}@labloom.com`,
-                phone: user.phone,
-                verificationStatus: 'pending'
-            });
-            user.entityReference = hospital._id;
-            user.entityModel = 'Hospital';
-            await user.save();
-        } else if (user.role === 'lab') {
-            const lab = await Lab.create({
-                name: user.name,
-                registrationNumber: `REG_PENDING_${user.phone}`,
-                email: user.email || `lab_${user.id}@labloom.com`,
-                phone: user.phone,
-                verificationStatus: 'pending'
-            });
-            user.entityReference = lab._id;
-            user.entityModel = 'Lab';
-            await user.save();
+    try {
+        if (!req.body) {
+            return res.status(400).json({ message: 'Request body is missing' });
         }
-        // Generate tokens for all roles (including doctors/labs/hospitals)
-        const accessToken = generateAccessToken(user.id, user.role);
-        const refreshToken = generateRefreshToken();
+        const { name, email, password, phone, role, privacyPolicyAccepted } = req.body;
 
-        // Save refresh token
-        await RefreshToken.create({
-            user: user.id,
-            token: refreshToken,
-            expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
+        if (!name || !phone) {
+            return res.status(400).json({ message: 'Please add name and phone number' });
+        }
+
+        // Validate role
+        const validRoles = ['patient', 'doctor', 'lab', 'hospital'];
+        const userRole = validRoles.includes(role) ? role : 'patient';
+
+        // Check if user exists
+        const userExists = await User.findOne({
+            $or: [
+                { phone },
+                ...(email ? [{ email }] : [])
+            ]
         });
 
-        res.status(201).json({
-            _id: user.id,
-            name: user.name,
-            email: user.email,
-            phone: user.phone,
-            role: user.role,
-            accessToken,
-            refreshToken,
-            message: 'Registration successful. Please upload your verification documents in the dashboard.'
+        if (userExists) {
+            return res.status(400).json({ message: 'User already exists' });
+        }
+
+        // Hash password if provided
+        let hashedPassword;
+        if (password) {
+            const salt = await bcrypt.genSalt(10);
+            hashedPassword = await bcrypt.hash(password, salt);
+        }
+
+        // Create user
+        // For doctor, lab, hospital: privacyPolicyAccepted defaults to false and is set to true ONLY by admin approval
+        const isPublicUser = ['patient'].includes(userRole);
+
+        const user = await User.create({
+            name,
+            email,
+            password: hashedPassword,
+            phone,
+            role: userRole,
+            privacyPolicyAccepted: isPublicUser ? Boolean(privacyPolicyAccepted) : false,
+            privacyPolicyAcceptedAt: (isPublicUser && privacyPolicyAccepted) ? Date.now() : undefined,
+            doctorProfile: userRole === 'doctor' ? { specialization: req.body.specialisation || 'General Physician' } : undefined
         });
-    } else {
-        res.status(400).json({ message: 'Invalid user data' });
+
+        if (user) {
+            if (user.role === 'hospital') {
+                const hospital = await Hospital.create({
+                    name: user.name,
+                    registrationNumber: `REG_PENDING_${user.phone}`,
+                    email: user.email || `hospital_${user.id}@labloom.com`,
+                    phone: user.phone,
+                    verificationStatus: 'pending'
+                });
+                user.entityReference = hospital._id;
+                user.entityModel = 'Hospital';
+                await user.save();
+            } else if (user.role === 'lab') {
+                const lab = await Lab.create({
+                    name: user.name,
+                    registrationNumber: `REG_PENDING_${user.phone}`,
+                    email: user.email || `lab_${user.id}@labloom.com`,
+                    phone: user.phone,
+                    verificationStatus: 'pending'
+                });
+                user.entityReference = lab._id;
+                user.entityModel = 'Lab';
+                await user.save();
+            }
+            // Generate tokens for all roles (including doctors/labs/hospitals)
+            const accessToken = generateAccessToken(user.id, user.role);
+            const refreshToken = generateRefreshToken();
+
+            // Save refresh token
+            await RefreshToken.create({
+                user: user.id,
+                token: refreshToken,
+                expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
+            });
+
+            res.status(201).json({
+                _id: user.id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                role: user.role,
+                accessToken,
+                refreshToken,
+                message: 'Registration successful. Please upload your verification documents in the dashboard.'
+            });
+        } else {
+            res.status(400).json({ message: 'Invalid user data' });
+        }
+    } catch (error) {
+        if (error.code === 11000) {
+            const field = Object.keys(error.keyPattern || {})[0] || 'account data';
+            return res.status(400).json({
+                message: `Duplicate field error: The ${field} you entered is already registered to another account.`
+            });
+        }
+        res.status(500).json({ message: error.message });
     }
 };
 
@@ -160,10 +170,19 @@ const requestOtp = async (req, res) => {
 // @access  Public
 const verifyOtp = async (req, res) => {
     const { phone, otp } = req.body;
+    console.log(`### Verifying OTP for ${phone}: Received ${otp} ###`);
 
     const user = await User.findOne({ phone });
 
-    if (user && user.otp === otp && user.otpExpires > Date.now()) {
+    if (!user) {
+        console.log(`### User not found for phone: ${phone} ###`);
+        return res.status(400).json({ message: 'User not found' });
+    }
+
+    const isMatch = user.otp === String(otp);
+    const isNotExpired = user.otpExpires > Date.now();
+
+    if (isMatch && isNotExpired) {
         // Removed approval check to allow login for document upload
         // const restrictedRoles = ['doctor', 'lab', 'hospital'];
         // if (restrictedRoles.includes(user.role) && !user.privacyPolicyAccepted) { ... }
@@ -281,7 +300,17 @@ const updateProfile = async (req, res) => {
         }
 
         // Update allowed fields
-        const allowedUpdates = ['name', 'email', 'phone', 'address', 'dateOfBirth', 'gender'];
+        const allowedUpdates = [
+            'name',
+            'firstName',
+            'lastName',
+            'email',
+            'phone',
+            'address',
+            'city',
+            'dob',
+            'gender'
+        ];
         allowedUpdates.forEach(field => {
             if (req.body[field] !== undefined) {
                 user[field] = req.body[field];
@@ -299,14 +328,23 @@ const updateProfile = async (req, res) => {
         res.json({
             _id: updatedUser.id,
             name: updatedUser.name,
+            firstName: updatedUser.firstName,
+            lastName: updatedUser.lastName,
             email: updatedUser.email,
             phone: updatedUser.phone,
             role: updatedUser.role,
             address: updatedUser.address,
-            dateOfBirth: updatedUser.dateOfBirth,
+            city: updatedUser.city,
+            dob: updatedUser.dob,
             gender: updatedUser.gender
         });
     } catch (error) {
+        if (error.code === 11000) {
+            const field = Object.keys(error.keyPattern || {})[0] || 'account data';
+            return res.status(400).json({
+                message: `Duplicate field error: The ${field} you entered is already registered to another account.`
+            });
+        }
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };

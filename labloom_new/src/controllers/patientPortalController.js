@@ -432,6 +432,12 @@ const updateHealthProfile = async (req, res) => {
             }
         });
     } catch (error) {
+        if (error.code === 11000) {
+            const field = Object.keys(error.keyPattern || {})[0] || 'account data';
+            return res.status(400).json({
+                message: `Duplicate field error: The ${field} you entered is already registered to another account.`
+            });
+        }
         res.status(500).json({ message: error.message });
     }
 };
