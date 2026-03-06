@@ -9,7 +9,10 @@ const {
     submitFeedback,
     getReviews,
     updateHealthProfile,
-    uploadProfileImage
+    uploadProfileImage,
+    getHospitals,
+    getHospitalDetails,
+    analyzeLabReport
 } = require('../controllers/patientPortalController');
 const { getMe, updateProfile } = require('../controllers/authV2Controller');
 const { getMetricHistory, addMetric } = require('../controllers/metricController');
@@ -242,6 +245,8 @@ router.get('/labs/:id/tests', getLabTests);
  *       200: { description: List of popular hospitals }
  */
 router.get('/hospitals/popular', getPopularHospitals);
+router.get('/hospitals', getHospitals);
+router.get('/hospitals/:id', getHospitalDetails);
 
 /**
  * @swagger
@@ -326,5 +331,6 @@ router.get('/reviews', getReviews);
  *       200: { description: Image uploaded }
  */
 router.post('/upload-profile-image', protect, upload.single('image'), uploadProfileImage);
+router.post('/analyze-report', protect, upload.single('file'), analyzeLabReport);
 
 module.exports = router;

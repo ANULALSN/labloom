@@ -45,19 +45,30 @@ const sendMessage = async (req, res) => {
             return res.status(403).json({ message: 'You are not authorized to chat in this booking' });
         }
 
-        // Only allow chat for confirmed or completed bookings
-        if (!['confirmed', 'completed'].includes(booking.status)) {
-            return res.status(403).json({ message: 'Chat is only available for confirmed or completed appointments' });
+        // Identify roles
+        const isPatient = booking.user.toString() === senderId;
+        const isDoctor = booking.doctor.toString() === senderId;
+
+        if (!isPatient && !isDoctor) {
+            return res.status(403).json({ message: 'Not authorized to chat in this booking' });
         }
 
-        // Check 7-day window from completion date (or appointment date if not yet completed)
-        const baseDate = booking.completedAt ? new Date(booking.completedAt) : new Date(booking.date);
-        const sevenDaysAfter = new Date(baseDate);
-        sevenDaysAfter.setDate(baseDate.getDate() + 7);
-        const now = new Date();
+        // Rule: Only allow chat for confirmed or completed bookings
+        if (!['confirmed', 'completed', 'verified'].includes(booking.status)) {
+            return res.status(403).json({ message: 'Chat is only available for confirmed appointments' });
+        }
 
-        if (now > sevenDaysAfter) {
-            return res.status(403).json({ message: 'Chat window has expired (7 days after appointment completion)' });
+        // Rule: Chat is available for 7 days from the appointment date for BOTH patient and doctor.
+        // Example: Appointment on 15/02/2026 → chat available until 21/02/2026.
+        const now = new Date();
+        const appointmentDate = new Date(booking.date);
+        const chatExpiryDate = new Date(appointmentDate);
+        chatExpiryDate.setDate(appointmentDate.getDate() + 7);
+
+        if (now > chatExpiryDate) {
+            return res.status(403).json({
+                message: 'Chat window has expired. Chat is available for 7 days after the appointment date.'
+            });
         }
 
         const message = await Message.create({
@@ -90,20 +101,29 @@ const getChatHistory = async (req, res) => {
             return res.status(404).json({ message: 'Booking not found' });
         }
 
-        // Verify access
-        // We strictly check if the requester is the user or the doctor listed in the booking
+        // Verify access: only the patient or doctor of this booking can view the chat
         if (booking.user.toString() !== userId && booking.doctor.toString() !== userId) {
             return res.status(403).json({ message: 'Not authorized to view this chat' });
         }
 
-        const messages = await Message.find({ booking: bookingId })
-            .sort({ createdAt: 1 }) // Oldest first
-            .populate('sender', 'name image') // Populate sender details from User (if senderModel is User)
-            // Note: If senderModel is 'Doctor', and we populate 'sender', it might fail if we don't setup dynamic ref or if 'Doctor' model doesn't have name/image compatible fields.
-            // Message schema uses refPath, so it should populate correctly from the respective model.
-            ;
+        // Also check 7-day expiry for read access
+        const now = new Date();
+        const appointmentDate = new Date(booking.date);
+        const chatExpiryDate = new Date(appointmentDate);
+        chatExpiryDate.setDate(appointmentDate.getDate() + 7);
 
-        res.json(messages);
+        const isChatExpired = now > chatExpiryDate;
+
+        const messages = await Message.find({ booking: bookingId })
+            .sort({ createdAt: 1 })
+            .populate('sender', 'name image');
+
+        res.json({
+            messages,
+            isChatExpired,
+            chatExpiryDate: chatExpiryDate.toISOString(),
+            appointmentDate: appointmentDate.toISOString()
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
