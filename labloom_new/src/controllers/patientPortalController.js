@@ -88,7 +88,7 @@ const getLabs = async (req, res) => {
             return obj;
         });
 
-        res.json(mappedLabs);
+        res.json({ labs: mappedLabs });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -142,7 +142,7 @@ const getPopularHospitals = async (req, res) => {
             .limit(5)
             .select('name address rating reviewsCount image departments type');
 
-        res.json(hospitals);
+        res.json({ hospitals });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

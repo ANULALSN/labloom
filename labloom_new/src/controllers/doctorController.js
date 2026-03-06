@@ -8,28 +8,61 @@ const User = require('../models/User');
 // @access  Public
 const getDoctors = async (req, res) => {
     try {
-        // ONLY show doctors whose verification has been explicitly approved by admin
-        const userDoctors = await User.find({
+        const { specialty, search } = req.query;
+        let userFilter = {
             role: 'doctor',
             'doctorProfile.verificationStatus': 'approved',
             isActive: { $ne: false }
-        }).select('name phone email doctorProfile createdAt');
+        };
 
-        // Normalize user-doctors to match Doctor model shape
+        if (specialty) {
+            userFilter['doctorProfile.specialization'] = { $regex: specialty, $options: 'i' };
+        }
+        if (search) {
+            userFilter.name = { $regex: search, $options: 'i' };
+        }
+
+        const userDoctors = await User.find(userFilter).select('name phone email doctorProfile image createdAt');
+
+        // Normalize user-doctors
         const normalizedUserDocs = userDoctors.map(u => ({
             _id: u._id,
             name: u.name,
             specialization: u.doctorProfile?.specialization || 'General Physician',
-            rating: u.doctorProfile?.rating || 0,
-            reviewsCount: u.doctorProfile?.reviewsCount || 0,
+            rating: u.doctorProfile?.rating || 4.8,
+            reviewsCount: u.doctorProfile?.reviewsCount || 10,
             price: u.doctorProfile?.consultationFee || 500,
             location: u.doctorProfile?.currentWorkingPlace || 'Not specified',
             phone: u.phone,
             image: u.image || 'https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-closed-posture_409827-254.jpg',
+            experience: u.doctorProfile?.experience || '5+',
             _source: 'user'
         }));
 
-        res.json(normalizedUserDocs);
+        // Also fetch from Doctor collection (seeded data)
+        let doctorFilter = {};
+        if (specialty) {
+            doctorFilter.specialization = { $regex: specialty, $options: 'i' };
+        }
+        if (search) {
+            doctorFilter.name = { $regex: search, $options: 'i' };
+        }
+
+        const doctors = await Doctor.find(doctorFilter);
+        const normalizedDocs = doctors.map(d => ({
+            _id: d._id,
+            name: d.name,
+            specialization: d.specialization,
+            rating: d.rating || 4.8,
+            reviewsCount: d.reviewsCount || 10,
+            price: d.price,
+            location: d.location,
+            image: d.image || 'https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-closed-posture_409827-254.jpg',
+            experience: d.about?.experience || '5+',
+            _source: 'doctor'
+        }));
+
+        res.json({ doctors: [...normalizedUserDocs, ...normalizedDocs] });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
