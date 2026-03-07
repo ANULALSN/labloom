@@ -257,11 +257,25 @@ const issuePrescription = async (req, res) => {
             return res.status(403).json({ message: 'Not authorized' });
         }
 
+        let prescriptionPdfUrl = null;
+        if (req.file) {
+            prescriptionPdfUrl = req.file.path;
+        }
+
         // Find or create consultation
         let consultation = await Consultation.findOne({ appointment: appointmentId });
 
         // Normalize if single object sent instead of array
-        let normPrescriptions = Array.isArray(prescriptions) ? prescriptions : [];
+        let normPrescriptions = [];
+        if (prescriptions) {
+            try {
+                normPrescriptions = typeof prescriptions === 'string' ? JSON.parse(prescriptions) : prescriptions;
+                if (!Array.isArray(normPrescriptions)) normPrescriptions = [];
+            } catch {
+                normPrescriptions = [];
+            }
+        }
+
         if (!prescriptions && req.body.medications) {
             // Handle flat object from PatientList.jsx
             normPrescriptions = [{
@@ -278,10 +292,12 @@ const issuePrescription = async (req, res) => {
                 doctor: req.user.id,
                 patient: appointment.user,
                 prescriptions: normPrescriptions,
+                prescriptionPdfUrl: prescriptionPdfUrl,
                 diagnosis: req.body.diagnosis // top level diagnosis if present
             });
         } else {
             consultation.prescriptions = normPrescriptions;
+            if (prescriptionPdfUrl) consultation.prescriptionPdfUrl = prescriptionPdfUrl;
             if (req.body.diagnosis) consultation.diagnosis = req.body.diagnosis;
             await consultation.save();
         }
@@ -291,6 +307,7 @@ const issuePrescription = async (req, res) => {
             appointment.visitSummary = {};
         }
         appointment.visitSummary.prescriptions = normPrescriptions;
+        if (prescriptionPdfUrl) appointment.visitSummary.prescriptionPdfUrl = prescriptionPdfUrl;
         appointment.visitSummary.diagnosis = req.body.diagnosis;
         await appointment.save();
 

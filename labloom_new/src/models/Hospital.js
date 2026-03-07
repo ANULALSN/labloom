@@ -79,6 +79,11 @@ const hospitalSchema = mongoose.Schema({
         issuedBy: { type: String },
         validUntil: { type: Date }
     }],
+    verificationDocuments: [{
+        name: { type: String },
+        url: { type: String },
+        uploadedAt: { type: Date, default: Date.now }
+    }],
     verificationStatus: {
         type: String,
         enum: ['pending', 'approved', 'rejected', 'suspended'],

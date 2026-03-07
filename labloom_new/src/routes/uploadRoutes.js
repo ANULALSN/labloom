@@ -7,6 +7,8 @@ const {
     deleteDoctorDocument,
     uploadLabDocument,
     deleteLabDocument,
+    uploadHospitalDocument,
+    deleteHospitalDocument,
     uploadPatientReport
 } = require('../controllers/uploadController');
 
@@ -30,9 +32,20 @@ router.post('/lab-document/:labId', protect, upload.single('document'), uploadLa
 // @access  Private (Lab Admin)
 router.delete('/lab-document/:labId/:docId', protect, deleteLabDocument);
 
+// @route   POST /api/upload/hospital-document/:hospitalId
+// @desc    Upload documents for hospital verification
+// @access  Private (Hospital Admin)
+router.post('/hospital-document/:hospitalId', protect, upload.single('document'), uploadHospitalDocument);
+
+// @route   DELETE /api/upload/hospital-document/:hospitalId/:docId
+// @desc    Delete a hospital verification document
+// @access  Private (Hospital Admin)
+router.delete('/hospital-document/:hospitalId/:docId', protect, deleteHospitalDocument);
+
 // @route   POST /api/upload/patient-report/:bookingId
 // @desc    Upload lab report and notify patient
 // @access  Private (Lab/Doctor)
 router.post('/patient-report/:bookingId', protect, upload.single('report'), uploadPatientReport);
 
 module.exports = router;
+

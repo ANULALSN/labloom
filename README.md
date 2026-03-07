@@ -6,7 +6,7 @@ Labloom is a premium, full-stack healthcare application designed for seamless in
 
 - **🛡️ Secure Onboarding**: Role-based access for Patients, Doctors, Hospitals, and Labs with OTP-based authentication.
 - **🩺 Doctor Consultations**: Search for specialists, book appointments, and maintain clinical histories.
-- **📱 Flutter Patient App**: The patient experience is designed for mobile integration (see the [Patient Mobile API Guide](./labloom_new/PATIENT_MOBILE_API.md)).
+- **📱 Flutter Patient App**: The patient experience is designed for mobile integration (see the [Patient Mobile API Guide](./Labloom-Assets/PATIENT_MOBILE_API.md)).
 - **🧪 Integrated Lab Workflow**: 
     - 🧪 **Labs**: Manage bookings and upload digital reports.
     - 🩺 **Doctors**: Review and verify reports before patient release.
@@ -16,12 +16,21 @@ Labloom is a premium, full-stack healthcare application designed for seamless in
 
 ---
 
+## 🚀 Recent Updates
+
+- **📄 Native PDF Rendering**: Integrated Google Docs Viewer as the default fallback to seamlessly display PDF medical reports without requiring downloads.
+- **✨ Redesigned Entity Cards**: Modern, visually appealing presentation for Doctors, Labs, and Hospitals with soft shadows, prominent profiles, and one-click sharing via the Web Share API (`navigator.share`).
+- **🛡️ Provider Verification Pipeline**: Robust system allowing doctors and labs to securely upload licensure documents directly on the portal for Admin review.
+
+---
+
 ## 📂 Repository Structure
 
 ```text
 Labloom/
 ├── labloom-web/       # Frontend (React + Vite)
-└── labloom_new/       # Backend (Node.js + Express + MongoDB)
+├── labloom_new/       # Backend (Node.js + Express + MongoDB)
+└── Labloom-Assets/    # Documentation & Mobile API
 ```
 
 ---
@@ -48,7 +57,7 @@ Labloom/
 For a comprehensive guide on the platform's architecture, functionalities, and module-wise working, please refer to the following:
 
 - **📄 [Full Project Documentation](./PROJECT_DOCUMENTATION.md)**: End-to-end functionalities, tech stack, and module details.
-- **📱 [Patient Mobile API Guide](./labloom_new/PATIENT_MOBILE_API.md)**: Flutter integration guide for mobile app developers.
+- **📱 [Patient Mobile API Guide](./Labloom-Assets/PATIENT_MOBILE_API.md)**: Flutter integration guide for mobile app developers.
 
 ---
 

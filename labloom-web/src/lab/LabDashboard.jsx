@@ -142,7 +142,7 @@ export default function LabDashboard() {
                                     <input
                                         type="file"
                                         hidden
-                                        accept=".jpg,.jpeg,.png,.webp"
+                                        accept=".jpg,.jpeg,.png,.webp,.pdf"
                                         onChange={handleDocumentUpload}
                                         disabled={uploadingDoc}
                                     />

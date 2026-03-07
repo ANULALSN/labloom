@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const Lab = require('../models/Lab');
+const Hospital = require('../models/Hospital');
 const Booking = require('../models/Booking');
 const sendEmail = require('../utils/mailer');
 
@@ -177,6 +178,73 @@ const deleteLabDocument = async (req, res) => {
     }
 };
 
+// @desc    Upload documents for hospital verification
+// @route   POST /api/upload/hospital-document/:hospitalId
+// @access  Private (Hospital Admin)
+const uploadHospitalDocument = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'Please upload a document.' });
+        }
+
+        const hospital = await Hospital.findById(req.params.hospitalId);
+        if (!hospital) {
+            return res.status(404).json({ message: 'Hospital not found.' });
+        }
+
+        const documentInfo = {
+            name: req.body.name || cleanFileName(req.file.originalname, 'Hospital Document'),
+            url: req.file.path
+        };
+
+        hospital.verificationDocuments.push(documentInfo);
+        await hospital.save();
+
+        res.status(200).json({
+            message: 'Hospital document uploaded successfully.',
+            document: documentInfo
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Delete a hospital verification document
+// @route   DELETE /api/upload/hospital-document/:hospitalId/:docId
+// @access  Private (Hospital Admin)
+const deleteHospitalDocument = async (req, res) => {
+    try {
+        const { cloudinary } = require('../config/cloudinary');
+        const hospital = await Hospital.findById(req.params.hospitalId);
+        if (!hospital) {
+            return res.status(404).json({ message: 'Hospital not found.' });
+        }
+
+        const doc = hospital.verificationDocuments?.id(req.params.docId);
+        if (!doc) {
+            return res.status(404).json({ message: 'Document not found.' });
+        }
+
+        // Delete from Cloudinary (best effort)
+        try {
+            const publicId = extractCloudinaryPublicId(doc.url);
+            if (publicId) {
+                await cloudinary.uploader.destroy(publicId, { resource_type: 'image' });
+            }
+        } catch (cloudErr) {
+            console.error('Cloudinary delete warning:', cloudErr.message);
+        }
+
+        // Remove from MongoDB
+        hospital.verificationDocuments.pull({ _id: req.params.docId });
+        await hospital.save();
+
+        res.status(200).json({ message: 'Document deleted successfully.' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 // @desc    Upload patient lab report and notify them
 // @route   POST /api/upload/patient-report/:bookingId
 // @access  Private (Lab/Doctor)
@@ -239,5 +307,7 @@ module.exports = {
     deleteDoctorDocument,
     uploadLabDocument,
     deleteLabDocument,
+    uploadHospitalDocument,
+    deleteHospitalDocument,
     uploadPatientReport
 };

@@ -25,6 +25,9 @@ const consultationSchema = mongoose.Schema({
     clinicalNotes: {
         type: String
     },
+    prescriptionPdfUrl: {
+        type: String
+    },
     vitalSigns: {
         temperature: { type: Number },
         bloodPressure: {

@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import api from '../api/client';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/Topbar';
+import DocViewerModal from '../components/DocViewerModal';
 
 export default function MyReports() {
     const [reports, setReports] = useState([]);
     const [prescriptions, setPrescriptions] = useState([]);
     const [tab, setTab] = useState('reports');
     const [loading, setLoading] = useState(true);
+    const [viewDoc, setViewDoc] = useState(null);
 
     useEffect(() => {
         Promise.all([
@@ -43,14 +45,33 @@ export default function MyReports() {
                         <div className="card">
                             <table className="data-table">
                                 <thead>
-                                    <tr><th>Date</th><th>Details</th><th>Status</th></tr>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Details</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
                                     {items.map((item, i) => (
                                         <tr key={i}>
-                                            <td>{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '—'}</td>
-                                            <td className="fw-600">{item.testName || item.diagnosis || item.name || 'Record'}</td>
-                                            <td><span className="badge badge-success">Available</span></td>
+                                            <td>{new Date(item.date).toLocaleDateString()}</td>
+                                            <td className="fw-600">
+                                                {tab === 'reports' ? item.title : `${item.medication} ${item.dosage ? `(${item.dosage})` : ''}`}
+                                            </td>
+                                            <td><span className={`badge ${item.status === 'Bad' ? 'badge-danger' : 'badge-success'}`}>{item.status || 'Available'}</span></td>
+                                            <td>
+                                                {(item.reportUrl || item.prescriptionPdfUrl) ? (
+                                                    <button
+                                                        className="btn btn-primary btn-sm"
+                                                        onClick={() => setViewDoc({ url: item.reportUrl || item.prescriptionPdfUrl, name: item.title || item.medication })}
+                                                    >
+                                                        👁️ View Document
+                                                    </button>
+                                                ) : (
+                                                    <span className="text-muted text-sm">— No File —</span>
+                                                )}
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -65,6 +86,14 @@ export default function MyReports() {
                     )}
                 </div>
             </div>
+
+            {viewDoc && (
+                <DocViewerModal
+                    url={viewDoc.url}
+                    name={viewDoc.name}
+                    onClose={() => setViewDoc(null)}
+                />
+            )}
         </div>
     );
 }

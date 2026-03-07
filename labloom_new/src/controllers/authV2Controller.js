@@ -111,6 +111,7 @@ const signup = async (req, res) => {
                 email: user.email,
                 phone: user.phone,
                 role: user.role,
+                entityReference: user.entityReference || null,
                 accessToken,
                 refreshToken,
                 message: 'Registration successful. Please upload your verification documents in the dashboard.'

@@ -14,7 +14,6 @@ const navConfig = {
     doctor: {
         label: 'Doctor',
         items: [
-            { icon: '🛡️', label: 'Verification', path: '/doctor/verification' },
             { icon: '', label: 'Appointments', path: '/doctor' },
             { icon: '', label: 'My Patients', path: '/doctor/patients' },
             { icon: '', label: 'Verify Reports', path: '/doctor/verify-reports' },

@@ -114,7 +114,7 @@ export default function DoctorVerification() {
                                 <h3 style={{ marginTop: 0 }}>📋 Step 1 — Upload Documents</h3>
                                 <p className="text-muted text-sm">
                                     Upload your Medical Registration Certificate (MRC) or Medical Council License.
-                                    Accepted formats: JPG, PNG, WebP.
+                                    Accepted formats: JPG, PNG, WebP, PDF.
                                 </p>
                                 <ul style={{ color: '#6b7280', fontSize: 13, paddingLeft: 18 }}>
                                     <li>Medical Registration Certificate</li>
@@ -147,7 +147,7 @@ export default function DoctorVerification() {
                                     <input
                                         type="file"
                                         hidden
-                                        accept=".jpg,.jpeg,.png,.webp"
+                                        accept=".jpg,.jpeg,.png,.webp,.pdf"
                                         onChange={handleDocumentUpload}
                                         disabled={uploadingDoc}
                                     />
@@ -202,7 +202,7 @@ export default function DoctorVerification() {
                                         <input
                                             type="file"
                                             hidden
-                                            accept=".jpg,.jpeg,.png,.webp"
+                                            accept=".jpg,.jpeg,.png,.webp,.pdf"
                                             onChange={handleDocumentUpload}
                                             disabled={uploadingDoc}
                                         />

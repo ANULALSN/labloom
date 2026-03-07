@@ -14,6 +14,7 @@ const {
     verifyReport
 } = require('../controllers/doctorPortalController');
 const { protect, verifyDoctor } = require('../middleware/authMiddleware');
+const { upload } = require('../config/cloudinary'); // Use Cloudinary for pdf uploads
 
 // Base path will be /api in index.js, so these will be /api/doctor/... or /api/appointments/...
 // But since the requirements grouped them, I'll mount them accordingly in index.js
@@ -163,15 +164,13 @@ router.post('/consultations/:appointmentId/records', protect, verifyDoctor, save
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
- *             properties:
- *               prescriptions: { type: array, items: { type: object } }
  *     responses:
  *       200: { description: Prescription issued }
  */
-router.post('/consultations/:appointmentId/prescribe', protect, verifyDoctor, issuePrescription);
+router.post('/consultations/:appointmentId/prescribe', protect, verifyDoctor, upload.single('prescriptionPdf'), issuePrescription);
 
 // Report verification
 router.get('/pending-reports', protect, verifyDoctor, getPendingReports);

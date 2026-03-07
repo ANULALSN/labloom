@@ -139,7 +139,8 @@ const getPrescriptions = async (req, res) => {
                         refillStatus: rx.refillStatus,
                         doctorName: booking.doctor?.name,
                         date: booking.date,
-                        specialization: booking.doctor?.specialization
+                        specialization: booking.doctor?.specialization,
+                        prescriptionPdfUrl: booking.visitSummary.prescriptionPdfUrl
                     });
                 });
             }

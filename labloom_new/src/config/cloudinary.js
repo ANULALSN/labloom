@@ -10,10 +10,17 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
-    params: {
-        folder: 'labloom_uploads',
-        allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-        resource_type: 'image'
+    params: async (req, file) => {
+        const isPdf = file.mimetype === 'application/pdf';
+        return {
+            folder: 'labloom_uploads',
+            allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'pdf'],
+            // PDFs must be uploaded as 'raw' or 'image' with pdf format on Cloudinary
+            // Using 'auto' lets Cloudinary determine the best resource_type
+            resource_type: isPdf ? 'raw' : 'image',
+            // Prevent fl_attachment flag which forces download instead of inline viewing
+            flags: isPdf ? undefined : undefined,
+        };
     }
 });
 
@@ -21,11 +28,14 @@ const upload = multer({
     storage: storage,
     limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
     fileFilter: (req, file, cb) => {
-        const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        const allowed = [
+            'image/jpeg', 'image/jpg', 'image/png', 'image/webp',
+            'application/pdf'
+        ];
         if (allowed.includes(file.mimetype)) {
             cb(null, true);
         } else {
-            cb(new Error('Only image files are allowed (JPG, PNG, WebP)'));
+            cb(new Error('Only image files (JPG, PNG, WebP) and PDFs are allowed'));
         }
     }
 });

@@ -65,16 +65,16 @@ export default function DoctorDashboard() {
                     </div>
 
                     {profile && profile.verificationStatus !== 'approved' && (
-                        <div className="card mb-24" style={{ backgroundColor: 'var(--warning)', color: '#000', border: 'none' }}>
+                        <div className="card mb-24" style={{ backgroundColor: '#fef3c7', border: '1px solid #fbbf24' }}>
                             <div className="flex gap-16" style={{ alignItems: 'center' }}>
-                                <div style={{ fontSize: 24 }}>⚠️</div>
+                                <div style={{ fontSize: 20, color: '#92400e' }}>&#9888;</div>
                                 <div style={{ flex: 1 }}>
-                                    <h3 style={{ margin: 0, color: '#000' }}>Action Required: Account Verification Pending</h3>
-                                    <p style={{ margin: '4px 0 0 0', opacity: 0.8 }}>Your account is currently {profile.verificationStatus}. Patients cannot see your profile until you are approved.</p>
+                                    <h3 style={{ margin: 0, color: '#92400e' }}>Account Verification Pending</h3>
+                                    <p style={{ margin: '4px 0 0 0', color: '#78350f', fontSize: 13 }}>Your documents are being reviewed by our admin team. You'll be able to receive appointments once your account is approved.</p>
                                 </div>
-                                <a href="/doctor/verification" className="btn" style={{ backgroundColor: '#000', color: '#fff', border: 'none' }}>
-                                    Upload Documents
-                                </a>
+                                <span className="badge badge-warning" style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase' }}>
+                                    {profile.verificationStatus || 'Pending'}
+                                </span>
                             </div>
                         </div>
                     )}

@@ -49,6 +49,7 @@ export function AuthProvider({ children }) {
                 name: data.name,
                 role: data.role,
                 phone: data.phone,
+                entityReference: data.entityReference,
                 isHealthProfileComplete: data.isHealthProfileComplete
             };
             saveUser(userData, data.accessToken);

@@ -9,7 +9,7 @@ export default function PatientList() {
     const [selectedPatient, setSelectedPatient] = useState(null);
     const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [prescForm, setPrescForm] = useState({ diagnosis: '', medications: '', notes: '' });
+    const [prescForm, setPrescForm] = useState({ diagnosis: '', medications: '', notes: '', file: null });
     const toast = useToast();
 
     useEffect(() => {
@@ -26,7 +26,7 @@ export default function PatientList() {
         setSelectedPatient(patient);
         try {
             const data = await api.get(`/api/doctor/patients/${patient._id}/history`);
-            setHistory(Array.isArray(data) ? data : []);
+            setHistory(data.appointments || []);
         } catch {
             setHistory([]);
         }
@@ -34,10 +34,21 @@ export default function PatientList() {
 
     const prescribe = async (consultationId) => {
         if (!prescForm.diagnosis) return toast.error('Diagnosis is required');
+
+        const formData = new FormData();
+        formData.append('diagnosis', prescForm.diagnosis);
+        formData.append('medications', prescForm.medications);
+        formData.append('notes', prescForm.notes);
+        if (prescForm.file) {
+            formData.append('prescriptionPdf', prescForm.file);
+        }
+
         try {
-            await api.post(`/api/doctor/consultations/${consultationId}/prescribe`, prescForm);
+            await api.post(`/api/doctor/consultations/${consultationId}/prescribe`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
             toast.success('Prescription saved');
-            setPrescForm({ diagnosis: '', medications: '', notes: '' });
+            setPrescForm({ diagnosis: '', medications: '', notes: '', file: null });
             viewHistory(selectedPatient);
         } catch (err) {
             toast.error(err.message);
@@ -73,11 +84,16 @@ export default function PatientList() {
                                                 <span className="fw-600">{h.date ? new Date(h.date).toLocaleDateString() : 'Visit'}</span>
                                                 <span className={`badge ${h.status === 'completed' ? 'badge-success' : 'badge-info'}`}>{h.status}</span>
                                             </div>
-                                            {h.prescription ? (
+                                            {h.prescription || h.visitSummary?.prescriptions?.length > 0 ? (
                                                 <div style={{ padding: 12, background: 'var(--bg-input)', borderRadius: 'var(--radius)', fontSize: 13 }}>
-                                                    <div><strong>Diagnosis:</strong> {h.prescription.diagnosis}</div>
-                                                    {h.prescription.medications && <div><strong>Medications:</strong> {h.prescription.medications}</div>}
-                                                    {h.prescription.notes && <div className="text-muted mt-16">{h.prescription.notes}</div>}
+                                                    <div><strong>Diagnosis:</strong> {h.prescription?.diagnosis || h.visitSummary?.diagnosis}</div>
+                                                    {(h.prescription?.medications || h.visitSummary?.prescriptions?.[0]?.medication) && <div><strong>Medications:</strong> {h.prescription?.medications || h.visitSummary?.prescriptions?.[0]?.medication}</div>}
+                                                    {(h.prescription?.notes || h.visitSummary?.prescriptions?.[0]?.notes) && <div className="text-muted mt-16">{h.prescription?.notes || h.visitSummary?.prescriptions?.[0]?.notes}</div>}
+                                                    {(h.prescriptionPdfUrl || h.visitSummary?.prescriptionPdfUrl) && (
+                                                        <div className="mt-16">
+                                                            <a href={h.prescriptionPdfUrl || h.visitSummary?.prescriptionPdfUrl} target="_blank" rel="noreferrer" className="btn btn-secondary btn-sm">📄 View Prescription PDF</a>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             ) : h.status === 'completed' ? (
                                                 <div>
@@ -93,6 +109,10 @@ export default function PatientList() {
                                                     <div className="form-group">
                                                         <label>Notes</label>
                                                         <input className="form-input" placeholder="Notes" value={prescForm.notes} onChange={e => setPrescForm(f => ({ ...f, notes: e.target.value }))} />
+                                                    </div>
+                                                    <div className="form-group">
+                                                        <label>Upload Digital Prescription (PDF/Image)</label>
+                                                        <input type="file" className="form-input" accept=".pdf,image/*" onChange={e => setPrescForm(f => ({ ...f, file: e.target.files[0] }))} />
                                                     </div>
                                                     <button className="btn btn-primary btn-sm" onClick={() => prescribe(h._id)}>💊 Save Prescription</button>
                                                 </div>

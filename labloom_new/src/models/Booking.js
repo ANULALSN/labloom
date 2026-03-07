@@ -59,6 +59,7 @@ const bookingSchema = mongoose.Schema({
         anamnesis: { type: String }, // History
         symptoms: [{ type: String }], // e.g. ["Shortness of breath", "Blue-tinged lips"]
         diagnosis: { type: String }, // e.g. "Atrial Fibrillation"
+        prescriptionPdfUrl: { type: String }, // Optional PDF prescription URL path
         examinations: [{
             testName: { type: String },
             date: { type: Date },

@@ -141,7 +141,7 @@ export default function LabBookings() {
                                                                     type="file"
                                                                     hidden
                                                                     onChange={(e) => handleUploadReport(b._id, e)}
-                                                                    accept=".jpg,.jpeg,.png,.webp"
+                                                                    accept=".jpg,.jpeg,.png,.webp,.pdf"
                                                                     disabled={uploadingId === b._id}
                                                                 />
                                                             </label>

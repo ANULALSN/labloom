@@ -83,9 +83,9 @@ Labloom is a unified digital healthcare ecosystem connecting Patients, Doctors, 
 ### A. Professional Verification Flow
 1. **Doctor/Lab** signs up and logs in.
 2. Navigates to **Verification** page.
-3. Uploads images of certificates/ID (Restricted to JPG/PNG/WebP).
+3. Uploads images of certificates/ID (Supports JPG/PNG/WebP/PDF).
 4. **Admin** receives notification in "Pending Approvals".
-5. Admin views docs using **DocViewerModal**.
+5. Admin views docs using **DocViewerModal** (Which natively renders PDFs inline via the **Google Docs Viewer fallback**).
 6. Admin clicks "Approve". Access to core features (bookings/slots) is unlocked.
 
 ### B. Lab Report Lifecycle (The "Verified" Pipeline)
