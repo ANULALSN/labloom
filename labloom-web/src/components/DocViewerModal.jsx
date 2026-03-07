@@ -170,24 +170,26 @@ export default function DocViewerModal({ url, name, onClose }) {
                     )}
                 </span>
                 <div style={{ display: 'flex', gap: 8 }}>
-                    <a
-                        href={url}
-                        download
-                        target="_blank"
-                        rel="noreferrer"
-                        style={{
-                            background: 'rgba(255,255,255,0.15)',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: 8,
-                            padding: '6px 14px',
-                            cursor: 'pointer',
-                            fontSize: 13,
-                            textDecoration: 'none'
-                        }}
-                    >
-                        ⬇️ Download
-                    </a>
+                    {!isPdf && (
+                        <a
+                            href={url}
+                            download
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{
+                                background: 'rgba(255,255,255,0.15)',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: 8,
+                                padding: '6px 14px',
+                                cursor: 'pointer',
+                                fontSize: 13,
+                                textDecoration: 'none'
+                            }}
+                        >
+                            ⬇️ Download
+                        </a>
+                    )}
                     <button
                         onClick={onClose}
                         style={{

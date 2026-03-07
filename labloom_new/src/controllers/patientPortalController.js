@@ -307,18 +307,34 @@ const submitFeedback = async (req, res) => {
 
         // Update entity rating
         let Model;
-        if (targetType === 'doctor') Model = Doctor;
-        if (targetType === 'lab') Model = Lab;
-        if (targetType === 'hospital') Model = Hospital;
+        if (targetType === 'doctor') {
+            const userDoc = await User.findById(targetId);
+            if (userDoc && userDoc.role === 'doctor') {
+                Model = User;
+            } else {
+                Model = Doctor;
+            }
+        } else if (targetType === 'lab') {
+            Model = Lab;
+        } else if (targetType === 'hospital') {
+            Model = Hospital;
+        }
 
         if (Model) {
             const reviews = await Review.find({ [targetType]: targetId });
             const avgRating = reviews.reduce((acc, item) => item.rating + acc, 0) / reviews.length;
 
-            await Model.findByIdAndUpdate(targetId, {
-                rating: avgRating,
-                reviewsCount: reviews.length
-            });
+            if (Model === User) {
+                await User.findByIdAndUpdate(targetId, {
+                    'doctorProfile.rating': avgRating,
+                    'doctorProfile.reviewsCount': reviews.length
+                });
+            } else {
+                await Model.findByIdAndUpdate(targetId, {
+                    rating: avgRating,
+                    reviewsCount: reviews.length
+                });
+            }
         }
 
         res.status(201).json(review);

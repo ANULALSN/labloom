@@ -10,8 +10,9 @@ export default function HospitalReviews() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (user?._id) {
-            api.get(`/api/feedback/${user._id}?targetType=hospital`)
+        if (user) {
+            const targetId = user.entityReference || user._id;
+            api.get(`/api/feedback/${targetId}?targetType=hospital`)
                 .then(data => setReviews(Array.isArray(data) ? data : []))
                 .catch(() => setReviews([]))
                 .finally(() => setLoading(false));
