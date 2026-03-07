@@ -8,6 +8,7 @@ const {
     getDoctorSlots,
     submitFeedback,
     getReviews,
+    getMyReviews,
     updateHealthProfile,
     uploadProfileImage,
     getHospitals,
@@ -290,6 +291,7 @@ router.get('/doctors/:id/slots', getDoctorSlots);
  *       201: { description: Feedback submitted }
  */
 router.post('/feedback', protect, submitFeedback);
+router.get('/feedback/my', protect, getMyReviews);
 
 /**
  * @swagger
