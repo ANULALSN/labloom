@@ -1,161 +1,114 @@
 # 📱 Labloom Patient Mobile API (Flutter Integration Guide)
 
-This document provides a consolidated list of endpoints for the Flutter mobile application development team.
+This document provides a consolidated, up-to-date list of backend endpoints for the Flutter mobile application development team. 
 
-## 🔐 Authentication (Auth V2)
-All requests should use JSON headers. Protected routes require `Authorization: Bearer <access_token>`.
-
-| Feature | Method | Endpoint | Payload |
-| :--- | :--- | :--- | :--- |
-| **Request OTP** | `POST` | `/api/auth/v2/request-otp` | `{ "phone": "+91..." }` |
-| **Verify OTP** | `POST` | `/api/auth/v2/verify-otp` | `{ "phone": "+91...", "otp": "..." }` |
-| **Signup** | `POST` | `/api/auth/v2/signup` | `{ "name", "phone", "role": "patient" }` |
-| **Refresh Token**| `POST` | `/api/auth/v2/refresh-token` | `{ "refreshToken": "..." }` |
-
-## 🏠 Dashboard & Profile
-| Feature | Method | Endpoint | Description |
-| :--- | :--- | :--- | :--- |
-| **Complete Onboarding**| `PATCH`| `/api/patients/health-profile` | **Unified Onboarding (Step 1-4)** |
-| **Dashboard** | `GET` | `/api/patients/dashboard` | Counts of visits, reports, prescriptions |
-| **My Profile** | `GET` | `/api/patients/me` | Fetch personal and health profiling |
-| **Update Basic Info**| `PATCH`| `/api/patients/me` | Update health stats, address, etc. |
-| **Vitals History**| `GET` | `/api/patients/health-metrics` | Query `?type=bp` or `?type=all` |
-| **Log Vital** | `POST` | `/api/patients/health-metrics` | Log weight, BP, Heart rate, etc. |
-
-### 📋 Onboarding Payload Structure
-Used for the 4-step initial registration flow:
-```json
-{
-  "personalData": {
-    "firstName": "John",
-    "lastName": "Doe",
-    "dob": "1990-01-01",
-    "phone": "+919876543210",
-    "email": "your.email@example.com",
-    "city": "Mumbai",
-    "address": "123 Green Street"
-  },
-  "emergencyContact": {
-    "firstName": "Jane",
-    "lastName": "Doe",
-    "relationship": "Spouse",
-    "phone": "+919988776655",
-    "email": "email@example.com",
-    "city": "Mumbai",
-    "address": "456 Red Street"
-  },
-  "healthProfile": {
-    "bloodType": "O",
-    "rhFactor": "+",
-    "allergies": "Peanuts, Pollen",
-    "chronicConditions": "Migraines, Diabetes",
-    "height": 175,
-    "weight": 70,
-    "bloodPressure": { "systolic": 120, "diastolic": 80 }
-  },
-  "lifestyle": {
-    "smoking": "No",
-    "alcohol": "Occasionally",
-    "activityLevel": "Moderate"
-  }
-}
-```
-*Note: Successful completion sets `isHealthProfileComplete: true` on the user object.*
-
-## 🩺 Doctor & Hospital Discovery
-| Feature | Method | Endpoint | Description |
-| :--- | :--- | :--- | :--- |
-| **Search Doctors**| `GET` | `/api/patients/doctors` | Use query params for filtering |
-| **Doctor Slots** | `GET` | `/api/patients/doctors/:id/slots`| Query `?date=YYYY-MM-DD` |
-| **Hospitals** | `GET` | `/api/patients/hospitals/popular` | List top hospitals |
-
-## 🧪 Laboratory & Tests
-| Feature | Method | Endpoint | Description |
-| :--- | :--- | :--- | :--- |
-| **Search Labs** | `GET` | `/api/patients/labs` | Find labs nearby |
-| **Lab Tests** | `GET` | `/api/patients/labs/:id/tests` | List available tests in a lab |
-| **Book Test** | `POST` | `/api/patients/bookings` | Book a lab diagnostic test |
-
-## 📄 Records & Reports
-
-### Lab Report Flow (End-to-End)
-The lab report lifecycle follows this pipeline:
-
-```
-Patient books test → Lab completes test → Lab uploads report image
-                                              ↓
-                              Patient's last doctor auto-assigned
-                                              ↓
-                              Doctor verifies → Patient gets email
-                                              ↓
-                              Patient views verified report in app
-```
-
-| Feature | Method | Endpoint | Description |
-| :--- | :--- | :--- | :--- |
-| **Lab Reports** | `GET` | `/api/patients/reports` | **Only returns doctor-verified reports** |
-| **My Appointments**| `GET`| `/api/patients/appointments/me` | Includes `labReport` object with `reportUrl`, `verifiedByDoctor`, `status` |
-| **Prescriptions**| `GET` | `/api/patients/prescriptions`| Digital prescriptions from visits |
-
-### Lab Report Object (in booking response)
-```json
-{
-  "labReport": {
-    "reportUrl": "https://res.cloudinary.com/.../report.jpg",
-    "status": "Verified by Doctor",
-    "resultDate": "2026-03-05T10:00:00.000Z",
-    "verifiedByDoctor": true,
-    "verifiedBy": "doctor_user_id",
-    "referringDoctor": "doctor_user_id"
-  }
-}
-```
-
-**Report visibility rules for Flutter:**
-- Show `📄 View Report` button only when `labReport.verifiedByDoctor === true`
-- Show `⏳ Under Review` badge when `labReport.reportUrl` exists but `verifiedByDoctor === false`
-- Show nothing when `labReport` is null
-
-## 💬 Communication
-| Feature | Method | Endpoint | Description |
-| :--- | :--- | :--- | :--- |
-| **Chat History** | `GET` | `/api/chat/:bookingId` | Fetch messages for an appointment |
-| **Send Message** | `POST` | `/api/chat/send` | Send text to the doctor |
-
-## ⭐ Reviews & Feedback
-| Feature | Method | Endpoint | Description |
-| :--- | :--- | :--- | :--- |
-| **Submit Review** | `POST` | `/api/patients/feedback` | Rate a doctor, lab, or hospital |
-| **Get Reviews** | `GET` | `/api/patients/reviews` | Query `?targetId=...&targetType=doctor` |
-
-### 📝 Review Payload
-```json
-{
-  "targetId": "65ab123...",
-  "targetType": "doctor",
-  "targetName": "Dr. Smith",
-  "rating": 5,
-  "comment": "Excellent service and care."
-}
-```
-
-## 📄 File Uploads (Cloudinary Integration)
-*All uploads are **image-only** (JPG, PNG, WebP). PDFs are NOT supported.*
-
-| Feature | Method | Endpoint | Description | Payload |
-| :--- | :--- | :--- | :--- | :--- |
-| **Verify Doctor Docs** | `POST` | `/api/upload/doctor-document` | Upload doctor licensure/certificates | `FormData (document)` |
-| **Verify Lab Docs** | `POST` | `/api/upload/lab-document/:labId` | Upload lab ID/registration proofs | `FormData (document)` |
-| **Patient Report/Mail**| `POST` | `/api/upload/patient-report/:bookingId`| Upload & mail report to patient directly | `FormData (report)` |
-
-### 📧 Email Notifications
-The system sends emails to patients at these stages:
-1. **Report uploaded** — "Your report is under review by a doctor"
-2. **Report verified** — "Your report is ready! View it here: [link]"
-3. **Report emailed** — Lab can manually resend via `POST /api/lab/bookings/:id/send-email`
+All core patient routes below are prefixed with `/api/patients` unless specified otherwise.
 
 ---
-**Base URL:** `https://labloom.onrender.com`  
-**Swagger Docs:** `https://labloom.onrender.com/docs/swagger` (Fully detailed schema)
 
-> **⚠️ Important:** The patient portal is mobile-only (Flutter). The web app (`labloom-web`) only serves Admin, Doctor, Hospital, and Lab portals. Patient APIs remain fully functional for the Flutter app.
+## 🔐 1. Authentication & Onboarding
+**Base Path:** `/api/auth/v2` and `/api/patients`  
+**Headers:** `Content-Type: application/json`. Protected routes require `Authorization: Bearer <access_token>`.
+
+| Feature | Method | Endpoint | Payload / Description | Auth |
+| :--- | :--- | :--- | :--- | :--- |
+| **Request OTP** | `POST` | `/api/auth/v2/request-otp` | `{ "phone": "+91..." }` | Public |
+| **Verify OTP** | `POST` | `/api/auth/v2/verify-otp` | `{ "phone": "+91...", "otp": "..." }` | Public |
+| **Signup** | `POST` | `/api/auth/v2/signup` | `{ "name", "phone", "role": "patient" }` | Public |
+| **Refresh Token**| `POST` | `/api/auth/v2/refresh-token` | `{ "refreshToken": "..." }` | Public |
+| **Complete Onboarding**| `PATCH`| `/api/patients/health-profile` | Updates unified health profile (Steps 1-4) | Required |
+
+---
+
+## 👤 2. Profile & Dashboard
+**Base Path:** `/api/patients`
+
+| Feature | Method | Endpoint | Description | Auth |
+| :--- | :--- | :--- | :--- | :--- |
+| **Dashboard** | `GET` | `/dashboard` | Patient stats, upcoming appointments, recent reports | Required |
+| **My Profile** | `GET` | `/me` | Fetch logged-in patient's personal and health details | Required |
+| **Update Basic Info**| `PATCH`| `/me` | Update general information | Required |
+| **Upload Avatar** | `POST` | `/upload-profile-image`| `multipart/form-data` with `image` field | Required |
+
+---
+
+## 🩺 3. Entity Discovery (Doctors, Labs, Hospitals)
+**Base Path:** `/api/patients`
+
+| Feature | Method | Endpoint | Description | Auth |
+| :--- | :--- | :--- | :--- | :--- |
+| **Search Doctors**| `GET` | `/doctors` | Filter doctors (`?specialty=` or `?search=`) | Public |
+| **Search Labs** | `GET` | `/labs` | Find labs (`?city=` or `?search=`) | Public |
+| **Lab Tests** | `GET` | `/labs/:id/tests` | List available tests in a specific lab | Public |
+| **Hospitals** | `GET` | `/hospitals` | Find hospitals (`?city=` or `?search=`) | Public |
+| **Top Hospitals** | `GET` | `/hospitals/popular` | List highly-rated hospitals | Public |
+| **Hospital Details**| `GET` | `/hospitals/:id` | Full details of a specific hospital | Public |
+
+### 🔗 Profile Sharing (Deep Linking / \`share_plus\`)
+For the Flutter `share_plus` feature, the following endpoint provides comprehensive bio, consultation fees, experience, and reviews for a shared entity link.
+
+| Feature | Method | Endpoint | Description | Auth |
+| :--- | :--- | :--- | :--- | :--- |
+| **Doctor Details**| `GET` | `/api/doctors/:id/details` | Used to render full shared doctor profile | Public |
+
+---
+
+## 📅 4. Bookings & Appointments
+**Base Path:** `/api/patients`
+
+| Feature | Method | Endpoint | Description | Auth |
+| :--- | :--- | :--- | :--- | :--- |
+| **Doctor Slots** | `GET` | `/doctors/:id/slots` | Available slots (`?date=YYYY-MM-DD`) | Public |
+| **Book Doctor** | `POST` | `/appointments` | Payload: `{ "doctorId", "date", "time", "appointmentMode", "amount" }` | Required |
+| **My Appointments**| `GET` | `/appointments/me` | List consultation history & upcoming visits | Required |
+| **Book Lab Test** | `POST` | `/bookings` | Book a diagnostic test at a laboratory | Required |
+| **My Lab Tests** | `GET` | `/bookings/me` | History and status of lab tests | Required |
+
+---
+
+## 📄 5. Medical Records, AI & PDFs
+**Base Path:** `/api/patients`
+
+| Feature | Method | Endpoint | Description | Auth |
+| :--- | :--- | :--- | :--- | :--- |
+| **Lab Reports** | `GET` | `/reports` | Access finalized laboratory reports | Required |
+| **Prescriptions** | `GET` | `/prescriptions` | View digital prescriptions from doctors | Required |
+| **AI Summarize** | `POST` | `/analyze-report` | `multipart/form-data` with `file`. AI text analysis | Required |
+
+> **💡 Handling PDFs in Flutter**: The backend delivers Cloudinary URL links for reports. To prevent binary fetch crashes on mobile, do not try to parse them as JSON. Instead, pass the URL directly to packages like `url_launcher` (to open the browser) or `flutter_pdfview` (to embed the PDF inside the app).
+
+---
+
+## 📈 6. Health Metrics
+**Base Path:** `/api/patients/health-metrics`
+
+| Feature | Method | Endpoint | Description | Auth |
+| :--- | :--- | :--- | :--- | :--- |
+| **Vitals History**| `GET` | `/` | Query `?type=all` to see historical data | Required |
+| **Log Vital** | `POST` | `/` | Log metric manually | Required |
+
+---
+
+## ⭐ 7. Reviews & Feedback
+**Base Path:** `/api/patients`
+
+| Feature | Method | Endpoint | Description | Auth |
+| :--- | :--- | :--- | :--- | :--- |
+| **Submit Review** | `POST` | `/feedback` | `{ "targetId", "targetType", "rating", "comment" }` | Required |
+| **Get Reviews** | `GET` | `/reviews` | `?targetId=...&targetType=doctor\|lab\|hospital` | Public |
+| **My Reviews** | `GET` | `/feedback/my` | History of all reviews the patient has posted | Required |
+
+---
+
+## 💬 8. Communication (Chat)
+
+| Feature | Method | Endpoint | Description | Auth |
+| :--- | :--- | :--- | :--- | :--- |
+| **Chat History** | `GET` | `/api/chat/:bookingId` | Fetch messages for an appointment | Required |
+| **Send Message** | `POST` | `/api/chat/send` | Send text to the doctor | Required |
+
+---
+
+### 🌐 Environment Details
+* **Base URL:** `https://labloom.onrender.com` 
+* **Swagger API Docs:** `https://labloom.onrender.com/docs/swagger` (Includes detailed request/response schemas)
