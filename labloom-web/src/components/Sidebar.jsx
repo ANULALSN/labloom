@@ -20,6 +20,7 @@ const navConfig = {
             { icon: '', label: 'Manage Slots', path: '/doctor/slots' },
             { icon: '', label: 'Messages', path: '/doctor/chat' },
             { icon: '', label: 'Reviews', path: '/doctor/reviews' },
+            { icon: '', label: 'Settings & Profile', path: '/doctor/profile' },
         ]
     },
     hospital: {

@@ -186,7 +186,21 @@ const getHospitalDoctors = async (req, res) => {
 
         if (!hospital) return res.status(404).json({ message: 'Hospital not found' });
 
-        res.json(hospital.associatedDoctors);
+        const mappedDoctors = hospital.associatedDoctors.map(affil => {
+            if (!affil.doctorId) return null;
+            return {
+                _id: affil.doctorId._id,
+                name: affil.doctorId.name,
+                email: affil.doctorId.email,
+                phone: affil.doctorId.phone,
+                specialization: affil.doctorId.doctorProfile?.specialization || 'General',
+                department: affil.department,
+                isActive: affil.isActive,
+                joinedAt: affil.joinedAt
+            };
+        }).filter(d => d !== null);
+
+        res.json(mappedDoctors);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

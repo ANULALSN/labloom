@@ -11,7 +11,9 @@ const {
     getDoctorAvailability,
     updateDoctorAvailability,
     getPendingReports,
-    verifyReport
+    verifyReport,
+    getHospitalList,
+    joinHospital
 } = require('../controllers/doctorPortalController');
 const { protect, verifyDoctor } = require('../middleware/authMiddleware');
 const { upload } = require('../config/cloudinary'); // Use Cloudinary for pdf uploads
@@ -49,6 +51,8 @@ router.get('/appointments', protect, verifyDoctor, getDoctorAppointments);
 // Doctor availability / slot management
 router.get('/availability', protect, verifyDoctor, getDoctorAvailability);
 router.put('/availability', protect, verifyDoctor, updateDoctorAvailability);
+router.get('/hospitals', protect, verifyDoctor, getHospitalList);
+router.post('/join-hospital', protect, verifyDoctor, joinHospital);
 
 /**
  * @swagger

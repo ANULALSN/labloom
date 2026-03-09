@@ -21,7 +21,18 @@ export default function SlotManagement() {
         if (!form.doctorId || !form.date) return toast.error('Select doctor and date');
         setLoading(true);
         try {
-            await api.post('/api/hospital/slots/manage', form);
+            // Backend expects day string (e.g., "Monday") and slots array
+            const dateObj = new Date(form.date);
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const dayName = days[dateObj.getDay()];
+
+            const payload = {
+                doctorId: form.doctorId,
+                day: dayName,
+                slots: [{ startTime: form.startTime, endTime: form.endTime }]
+            };
+
+            await api.post('/api/hospital/slots/manage', payload);
             toast.success('Slot created successfully!');
             setForm({ doctorId: '', date: '', startTime: '', endTime: '' });
         } catch (err) {

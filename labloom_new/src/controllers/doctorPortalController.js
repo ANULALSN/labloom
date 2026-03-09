@@ -1,6 +1,7 @@
 const Booking = require('../models/Booking');
 const Consultation = require('../models/Consultation');
 const User = require('../models/User');
+const Hospital = require('../models/Hospital');
 const sendEmail = require('../utils/mailer');
 
 // @desc    Get doctor's appointments
@@ -460,6 +461,79 @@ const verifyReport = async (req, res) => {
     }
 };
 
+// @desc    Get all registered hospitals for dropdown
+// @route   GET /api/doctor/hospitals
+// @access  Private (Doctor only)
+const getHospitalList = async (req, res) => {
+    try {
+        const hospitals = await Hospital.find({ isActive: true }).select('name address city');
+        res.json(hospitals);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Select a hospital to join
+// @route   POST /api/doctor/join-hospital
+// @access  Private (Doctor only)
+const joinHospital = async (req, res) => {
+    try {
+        const { hospitalId } = req.body;
+        if (!hospitalId) {
+            return res.status(400).json({ message: 'Hospital ID is required' });
+        }
+
+        const hospital = await Hospital.findById(hospitalId);
+        if (!hospital) {
+            return res.status(404).json({ message: 'Hospital not found' });
+        }
+
+        const doctor = await User.findById(req.user.id);
+        if (!doctor || doctor.role !== 'doctor') {
+            return res.status(404).json({ message: 'Doctor profile not found' });
+        }
+
+        // Add to doctor's affiliations
+        if (!doctor.doctorProfile.hospitalAffiliations) {
+            doctor.doctorProfile.hospitalAffiliations = [];
+        }
+
+        const alreadyAffiliated = doctor.doctorProfile.hospitalAffiliations.find(
+            (h) => h.hospitalId && h.hospitalId.toString() === hospitalId
+        );
+
+        if (!alreadyAffiliated) {
+            doctor.doctorProfile.hospitalAffiliations.push({
+                hospitalId: hospitalId,
+                department: 'General'
+            });
+            await doctor.save();
+        }
+
+        // Add to hospital's associated doctors
+        if (!hospital.associatedDoctors) {
+            hospital.associatedDoctors = [];
+        }
+
+        const alreadyAssociated = hospital.associatedDoctors.find(
+            (d) => d.doctorId && d.doctorId.toString() === req.user.id
+        );
+
+        if (!alreadyAssociated) {
+            hospital.associatedDoctors.push({
+                doctorId: req.user.id,
+                department: 'General',
+                isActive: true
+            });
+            await hospital.save();
+        }
+
+        res.json({ message: 'Successfully joined hospital', ...doctor.doctorProfile });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     getDoctorAppointments,
     updateAppointmentStatus,
@@ -471,5 +545,7 @@ module.exports = {
     getDoctorAvailability,
     updateDoctorAvailability,
     getPendingReports,
-    verifyReport
+    verifyReport,
+    getHospitalList,
+    joinHospital
 };

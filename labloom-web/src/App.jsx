@@ -21,6 +21,7 @@ import ManageSlots from './doctor/ManageSlots';
 import DoctorChat from './doctor/DoctorChat';
 import VerifyReports from './doctor/VerifyReports';
 import DoctorReviews from './doctor/DoctorReviews';
+import DoctorProfile from './doctor/DoctorProfile';
 
 // Hospital
 import HospitalDashboard from './hospital/HospitalDashboard';
@@ -121,6 +122,7 @@ export default function App() {
             <Route path="/doctor/chat" element={<ProtectedRoute allowedRoles={['doctor']}><DoctorChat /></ProtectedRoute>} />
             <Route path="/doctor/verify-reports" element={<ProtectedRoute allowedRoles={['doctor']}><VerifyReports /></ProtectedRoute>} />
             <Route path="/doctor/reviews" element={<ProtectedRoute allowedRoles={['doctor']}><DoctorReviews /></ProtectedRoute>} />
+            <Route path="/doctor/profile" element={<ProtectedRoute allowedRoles={['doctor']}><DoctorProfile /></ProtectedRoute>} />
 
             {/* Hospital Portal */}
             <Route path="/hospital" element={<ProtectedRoute allowedRoles={['hospital']}><HospitalDashboard /></ProtectedRoute>} />
