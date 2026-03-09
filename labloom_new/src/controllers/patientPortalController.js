@@ -432,7 +432,7 @@ const getAllReviews = async (req, res) => {
 // @access  Private (Patient)
 const updateHealthProfile = async (req, res) => {
     try {
-        const { personalData, emergencyContact, healthProfile, lifestyle } = req.body;
+        const { personalData, emergencyContact, healthProfile, lifestyle, insurance } = req.body;
         const user = await User.findById(req.user.id);
 
         if (!user) {
@@ -460,7 +460,8 @@ const updateHealthProfile = async (req, res) => {
                     },
                     emergencyContact: user.emergencyContact,
                     healthProfile: user.healthProfile,
-                    lifestyle: user.lifestyle
+                    lifestyle: user.lifestyle,
+                    insurance: user.insurance
                 }
             });
         }
@@ -507,6 +508,15 @@ const updateHealthProfile = async (req, res) => {
             user.lifestyle = { ...user.lifestyle, ...lifestyle };
         }
 
+        // 5. Insurance
+        if (insurance) {
+            user.insurance = {
+                ...user.insurance,
+                ...insurance,
+                policyExpiryDate: insurance.policyExpiryDate || user.insurance?.policyExpiryDate
+            };
+        }
+
         user.isHealthProfileComplete = true;
         await user.save();
 
@@ -527,7 +537,8 @@ const updateHealthProfile = async (req, res) => {
                 },
                 emergencyContact: user.emergencyContact,
                 healthProfile: user.healthProfile,
-                lifestyle: user.lifestyle
+                lifestyle: user.lifestyle,
+                insurance: user.insurance
             }
         });
     } catch (error) {
